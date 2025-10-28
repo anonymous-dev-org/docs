@@ -1,12 +1,13 @@
 ---
-title: "API Reference"
-description: "Complete API documentation with examples and type definitions"
-icon: "book-open"
+title: 'API Reference'
+description: 'Complete API documentation with examples and type definitions'
+icon: 'book-open'
 ---
 
 # 🔧 API Reference
 
-Firetype generates fully typed APIs that mirror your Firestore database structure. Here's a comprehensive reference of the generated functions and types.
+Firetype generates fully typed APIs that mirror your Firestore database structure. Here's a
+comprehensive reference of the generated functions and types.
 
 ## Generated Functions
 
@@ -34,7 +35,7 @@ Creates a type-safe Firestore API for client-side operations using the Firebase 
 
 The generated API mirrors your directory structure. For this schema structure:
 
-```
+```text
 schemas/database/
 ├── users/
 │   ├── schema.ts
@@ -47,11 +48,11 @@ schemas/database/
 You get this typed API:
 
 ```typescript
-const firetype = createFireTypeAdmin(db)
+const firetype = createFireTypeAdmin(db);
 
-firetype.users // /users collection API
-firetype.users.posts // /users/{userId}/posts subcollection API
-firetype.posts // /posts collection API
+firetype.users; // /users collection API
+firetype.users.posts; // /users/{userId}/posts subcollection API
+firetype.posts; // /posts collection API
 ```
 
 ## Collection API Methods
@@ -72,8 +73,8 @@ Returns a typed Firestore collection reference.
 **Example:**
 
 ```typescript
-const usersRef = firetype.users.getCollectionRef(true) // With validation
-const usersRef = firetype.users.getCollectionRef() // Without validation
+const usersRef = firetype.users.getCollectionRef(true); // With validation
+const usersRef = firetype.users.getCollectionRef(); // Without validation
 ```
 
 ### `getDocumentRef(documentId, validate?: boolean)`
@@ -93,7 +94,7 @@ Returns a typed Firestore document reference.
 **Example:**
 
 ```typescript
-const userDoc = firetype.users.getDocumentRef("user123", true)
+const userDoc = firetype.users.getDocumentRef('user123', true);
 ```
 
 ### `getCollectionGroupRef(validate?: boolean)`
@@ -113,12 +114,12 @@ Returns a typed collection group reference for querying across all subcollection
 
 ```typescript
 // Query all posts across all users
-const allPosts = firetype.users.posts.getCollectionGroupRef()
+const allPosts = firetype.users.posts.getCollectionGroupRef();
 const recentPosts = await allPosts
-  .where("published", "==", true)
-  .orderBy("createdAt", "desc")
+  .where('published', '==', true)
+  .orderBy('createdAt', 'desc')
   .limit(10)
-  .get()
+  .get();
 ```
 
 ## Subcollection API Methods
@@ -137,8 +138,8 @@ For subcollections, the API methods require parent document IDs:
 ```typescript
 // Get posts for a specific user
 const userPostsRef = firetype.users.posts.getCollectionRef({
-  usersId: "user123",
-})
+  usersId: 'user123',
+});
 ```
 
 ### `getDocumentRef(args, documentId, validate?: boolean)`
@@ -153,10 +154,7 @@ const userPostsRef = firetype.users.posts.getCollectionRef({
 
 ```typescript
 // Get a specific post from a user
-const userPostDoc = firetype.users.posts.getDocumentRef(
-  { usersId: "user123" },
-  "post456"
-)
+const userPostDoc = firetype.users.posts.getDocumentRef({ usersId: 'user123' }, 'post456');
 ```
 
 ## Validation
@@ -165,20 +163,20 @@ Firetype supports optional runtime validation using your Zod schemas:
 
 ```typescript
 // Enable validation for all operations
-const firetype = createFireTypeAdmin(db)
+const firetype = createFireTypeAdmin(db);
 
 // Collection operations with validation
-const usersRef = firetype.users.getCollectionRef(true)
+const usersRef = firetype.users.getCollectionRef(true);
 
 // Document operations with validation
-const userDoc = firetype.users.getDocumentRef("user123", true)
+const userDoc = firetype.users.getDocumentRef('user123', true);
 
 // Invalid data will throw Zod validation errors
 await usersRef.add({
-  name: "", // ❌ Fails validation (empty string)
-  email: "invalid", // ❌ Fails validation (not email)
+  name: '', // ❌ Fails validation (empty string)
+  email: 'invalid', // ❌ Fails validation (not email)
   createdAt: new Date(),
-})
+});
 ```
 
 ## Type Safety
@@ -187,15 +185,15 @@ All generated APIs are fully type-safe:
 
 ```typescript
 // TypeScript knows the exact shape of your data
-const user = await userDoc.get()
-const userData = user.data()
+const user = await userDoc.get();
+const userData = user.data();
 // userData is typed as your User schema type
 
 // Autocomplete and type checking for all fields
-userData.name // string
-userData.email // string
-userData.age // number | undefined
-userData.metadata // { lastLogin?: Date; isVerified: boolean; ... }
+userData.name; // string
+userData.email; // string
+userData.age; // number | undefined
+userData.metadata; // { lastLogin?: Date; isVerified: boolean; ... }
 ```
 
 ## Error Handling
@@ -208,12 +206,12 @@ Firetype throws descriptive errors for common issues:
 
 ```typescript
 try {
-  await usersRef.add(invalidUserData)
+  await usersRef.add(invalidUserData);
 } catch (error) {
   if (error instanceof z.ZodError) {
-    console.log("Validation failed:", error.errors)
+    console.log('Validation failed:', error.errors);
   } else {
-    console.log("Firestore error:", error)
+    console.log('Firestore error:', error);
   }
 }
 ```
@@ -254,12 +252,12 @@ For each schema file, Firetype generates:
 Creates a strongly-typed Firestore document reference field.
 
 ```typescript
-import { firestoreRef } from "@anonymous-dev/firetype"
+import { firestoreRef } from '@anonymous-dev/firetype';
 
 const schema = z.object({
-  userRef: firestoreRef("users"),
-  postRef: firestoreRef("users/posts"),
-})
+  userRef: firestoreRef('users'),
+  postRef: firestoreRef('users/posts'),
+});
 ```
 
 ### `collectionPath(path)`
@@ -267,9 +265,9 @@ const schema = z.object({
 Creates a branded collection path for better type safety.
 
 ```typescript
-import { collectionPath, type CollectionPath } from "@anonymous-dev/firetype"
+import { collectionPath, type CollectionPath } from '@anonymous-dev/firetype';
 
-const userPath: CollectionPath = collectionPath("users")
+const userPath: CollectionPath = collectionPath('users');
 ```
 
 ## Best Practices
@@ -278,11 +276,11 @@ const userPath: CollectionPath = collectionPath("users")
 
 ```typescript
 // Development: Enable validation everywhere
-const firetype = createFireTypeAdmin(db)
-const usersRef = firetype.users.getCollectionRef(true)
+const firetype = createFireTypeAdmin(db);
+const usersRef = firetype.users.getCollectionRef(true);
 
 // Production: Disable validation for performance
-const usersRef = firetype.users.getCollectionRef(false)
+const usersRef = firetype.users.getCollectionRef(false);
 ```
 
 ### Error Handling Patterns
@@ -291,19 +289,19 @@ const usersRef = firetype.users.getCollectionRef(false)
 // Centralized error handling
 async function createUser(userData: UserCreate) {
   try {
-    const docRef = await firetype.users.getCollectionRef(true).add(userData)
-    return { success: true, id: docRef.id }
+    const docRef = await firetype.users.getCollectionRef(true).add(userData);
+    return { success: true, id: docRef.id };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return {
         success: false,
-        errors: error.errors.map(e => ({
-          field: e.path.join("."),
+        errors: error.errors.map((e) => ({
+          field: e.path.join('.'),
           message: e.message,
         })),
-      }
+      };
     }
-    throw error // Re-throw Firestore errors
+    throw error; // Re-throw Firestore errors
   }
 }
 ```
@@ -312,19 +310,19 @@ async function createUser(userData: UserCreate) {
 
 ```typescript
 // Collection group queries
-const allPosts = firetype.users.posts.getCollectionGroupRef()
+const allPosts = firetype.users.posts.getCollectionGroupRef();
 
 // Type-safe where clauses
 const publishedPosts = await allPosts
-  .where("published", "==", true)
-  .where("createdAt", ">", new Date(Date.now() - 86400000)) // Last 24h
-  .orderBy("createdAt", "desc")
+  .where('published', '==', true)
+  .where('createdAt', '>', new Date(Date.now() - 86400000)) // Last 24h
+  .orderBy('createdAt', 'desc')
   .limit(10)
-  .get()
+  .get();
 
 // Fully typed results
-publishedPosts.docs.forEach(doc => {
-  const post = doc.data()
+publishedPosts.docs.forEach((doc) => {
+  const post = doc.data();
   // post is fully typed with your Post schema
-})
+});
 ```

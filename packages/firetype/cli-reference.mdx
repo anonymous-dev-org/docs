@@ -1,7 +1,7 @@
 ---
-title: "CLI Reference"
-description: "Complete guide to the Firetype command-line interface"
-icon: "terminal"
+title: 'CLI Reference'
+description: 'Complete guide to the Firetype command-line interface'
+icon: 'terminal'
 ---
 
 # 🛠️ CLI Reference
@@ -29,24 +29,29 @@ npx @anonymous-dev/firetype generate [options]
 
 <Tabs>
   <Tab title="Both SDKs">
-    ```bash # Generate types for both SDKs npx @anonymous-dev/firetype generate
-    --input=./schemas --output=./types ```
+    ```bash # Generate types for both SDKs npx @anonymous-dev/firetype generate --input=./schemas
+    --output=./types
+    ```
   </Tab>
   <Tab title="Admin Only">
-    ```bash # Generate only admin SDK types npx @anonymous-dev/firetype generate
-    --mode=admin --input=./schemas --output=./types ```
+    ```bash # Generate only admin SDK types npx @anonymous-dev/firetype generate --mode=admin
+    --input=./schemas --output=./types
+    ```
   </Tab>
-  <Tab title="Client Only">
-    ```bash # Generate only client SDK types npx @anonymous-dev/firetype
-    generate --mode=client --input=./src/database --output=./lib/types ```
+  <Tab title="Client Only" description="Generate types for the client SDK">
+    ```bash # Generate only client SDK types npx @anonymous-dev/firetype generate --mode=client
+    --input=./src/database --output=./lib/types
+    ```
   </Tab>
   <Tab title="Same Directory">
-    ```bash # Use shorthand for same input/output directory npx
-    @anonymous-dev/firetype generate --path=./firestore ```
+    ```bash # Use shorthand for same input/output directory npx @anonymous-dev/firetype generate
+    --path=./firestore
+    ```
   </Tab>
   <Tab title="Nested Schemas">
-    ```bash # Organize schemas in subdirectories npx @anonymous-dev/firetype
-    generate --input=./src/schemas/firestore --output=./src/types ```
+    ```bash # Organize schemas in subdirectories npx @anonymous-dev/firetype generate
+    --input=./src/schemas/firestore --output=./src/types
+    ```
   </Tab>
 </Tabs>
 
@@ -68,15 +73,14 @@ The CLI generates an `index.ts` file in your output directory containing:
 
 ### File Structure Example
 
-```
+```text
 types/
 └── index.ts          # Generated types and API functions
 ```
 
 <Note>
-  📝 **Note**: Always regenerate types after modifying your schemas. The
-  generated file includes import statements for the required Firestore SDKs
-  based on your `--mode` selection.
+  📝 **Note**: Always regenerate types after modifying your schemas. The generated file includes
+  import statements for the required Firestore SDKs based on your `--mode` selection.
 </Note>
 
 ## CLI Usage Patterns
@@ -119,7 +123,7 @@ name: Generate Types
 on:
   push:
     paths:
-      - "schemas/**"
+      - 'schemas/**'
 jobs:
   generate:
     runs-on: ubuntu-latest
@@ -127,7 +131,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: '18'
       - run: npm ci
       - run: npx @anonymous-dev/firetype generate --input=./schemas --output=./types
       - run: npm run type-check

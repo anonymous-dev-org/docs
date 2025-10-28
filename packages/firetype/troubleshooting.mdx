@@ -1,7 +1,7 @@
 ---
-title: "Troubleshooting"
-description: "Common issues and their solutions for Firetype"
-icon: "wrench"
+title: 'Troubleshooting'
+description: 'Common issues and their solutions for Firetype'
+icon: 'wrench'
 ---
 
 # 🔍 Troubleshooting
@@ -58,8 +58,8 @@ npx @anonymous-dev/firetype generate --input=./schemas --output=./types
 
 ```typescript
 // Enable validation
-const collectionRef = firetype.users.getCollectionRef(true)
-const documentRef = firetype.users.getDocumentRef("id", true)
+const collectionRef = firetype.users.getCollectionRef(true);
+const documentRef = firetype.users.getDocumentRef('id', true);
 ```
 
 ### Import errors
@@ -87,7 +87,7 @@ const documentRef = firetype.users.getDocumentRef("id", true)
 
 **Example**:
 
-```
+```text
 ✅ Correct:
 schemas/database/users/schema.ts
 export const schema = z.object({...})
@@ -116,16 +116,16 @@ export const userSchema = z.object({...})
 
 ```typescript
 // ✅ Correct discriminated union
-export const schema = z.discriminatedUnion("type", [
-  z.object({ type: z.literal("a"), value: z.string() }),
-  z.object({ type: z.literal("b"), value: z.number() }),
-])
+export const schema = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('a'), value: z.string() }),
+  z.object({ type: z.literal('b'), value: z.number() }),
+]);
 
 // ❌ Incorrect - missing discriminator
 export const schema = z.union([
-  z.object({ type: z.literal("a"), value: z.string() }),
-  z.object({ type: z.literal("b"), value: z.number() }),
-])
+  z.object({ type: z.literal('a'), value: z.string() }),
+  z.object({ type: z.literal('b'), value: z.number() }),
+]);
 ```
 
 ## Runtime Issues
@@ -138,16 +138,16 @@ export const schema = z.union([
 
 ```typescript
 try {
-  await collectionRef.add(data)
+  await collectionRef.add(data);
 } catch (error) {
   if (error instanceof z.ZodError) {
-    const formattedErrors = error.errors.map(err => ({
-      field: err.path.join("."),
+    const formattedErrors = error.errors.map((err) => ({
+      field: err.path.join('.'),
       code: err.code,
       message: err.message,
       received: err.received,
-    }))
-    console.error("Validation failed:", formattedErrors)
+    }));
+    console.error('Validation failed:', formattedErrors);
   }
 }
 ```
@@ -171,15 +171,15 @@ try {
 1. **Disable validation in production**:
 
    ```typescript
-   const collectionRef = firetype.users.getCollectionRef(false) // No validation
+   const collectionRef = firetype.users.getCollectionRef(false); // No validation
    ```
 
 2. **Use batch operations** for multiple writes:
 
    ```typescript
-   const batch = db.batch()
+   const batch = db.batch();
    // Add multiple operations to batch
-   await batch.commit()
+   await batch.commit();
    ```
 
 3. **Optimize queries** with proper indexes
@@ -258,11 +258,9 @@ Inspect generated types using TypeScript's utility types:
 // Check what types are generated
 type UserType = Parameters<typeof createFireTypeAdmin>[0] extends Firestore
   ? Awaited<
-      ReturnType<
-        ReturnType<typeof createFireTypeAdmin>["users"]["getCollectionRef"]
-      >
-    >["_documentType"]
-  : never
+      ReturnType<ReturnType<typeof createFireTypeAdmin>['users']['getCollectionRef']>
+    >['_documentType']
+  : never;
 ```
 
 ### Runtime Type Checking
@@ -270,21 +268,21 @@ type UserType = Parameters<typeof createFireTypeAdmin>[0] extends Firestore
 Add runtime type validation for debugging:
 
 ```typescript
-import { z } from "zod"
+import { z } from 'zod';
 
 // Debug helper
 function validateSchema<T>(schema: z.ZodSchema<T>, data: unknown): T {
   try {
-    return schema.parse(data)
+    return schema.parse(data);
   } catch (error) {
-    console.error("Schema validation failed:", error)
-    throw error
+    console.error('Schema validation failed:', error);
+    throw error;
   }
 }
 
 // Use in your operations
-const validData = validateSchema(userSchema, inputData)
-await collectionRef.add(validData)
+const validData = validateSchema(userSchema, inputData);
+await collectionRef.add(validData);
 ```
 
 ### Performance Profiling
@@ -292,8 +290,8 @@ await collectionRef.add(validData)
 Profile Firetype operations:
 
 ```typescript
-const start = performance.now()
-const result = await firetype.users.getCollectionRef().get()
-const end = performance.now()
-console.log(`Query took ${end - start} milliseconds`)
+const start = performance.now();
+const result = await firetype.users.getCollectionRef().get();
+const end = performance.now();
+console.log(`Query took ${end - start} milliseconds`);
 ```

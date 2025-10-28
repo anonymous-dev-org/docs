@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "mint dev",
     "format": "prettier --write .",
-    "lint:mdx": "remark . --quiet --frail --ext .md,.mdx"
+    "lint": "remark . --frail --ext .md,.mdx"
   },
   "repository": {
     "type": "git",
