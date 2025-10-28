@@ -1,0 +1,555 @@
+---
+title: "Examples & Patterns"
+description: "Real-world usage examples and common patterns with Firetype"
+icon: "lightbulb"
+---
+
+# 💡 Examples & Patterns
+
+Real-world examples and patterns for using Firetype in your applications.
+
+## Basic CRUD Operations
+
+### User Management System
+
+```typescript
+// schemas/database/users/schema.ts
+import { z } from "zod"
+
+export const schema = z.object({
+  email: z.string().email(),
+  displayName: z.string().min(1),
+  role: z.enum(["user", "admin", "moderator"]).default("user"),
+  profile: z.object({
+    avatar: z.string().url().optional(),
+    bio: z.string().max(500).optional(),
+    website: z.string().url().optional(),
+  }),
+  preferences: z.record(z.unknown()).default({}),
+  emailVerified: z.boolean().default(false),
+  lastLogin: z.date().optional(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+})
+```
+
+```typescript
+// User service
+import { createFireTypeAdmin } from "../types"
+import { getFirestore } from "firebase-admin/firestore"
+
+class UserService {
+  private firetype = createFireTypeAdmin(getFirestore())
+
+  async createUser(userData: Omit<User, "createdAt" | "updatedAt">) {
+    const now = new Date()
+    const user = {
+      ...userData,
+      createdAt: now,
+      updatedAt: now,
+    }
+
+    const docRef = await this.firetype.users.getCollectionRef(true).add(user)
+    return docRef.id
+  }
+
+  async getUser(userId: string) {
+    const doc = await this.firetype.users.getDocumentRef(userId).get()
+    return doc.exists ? doc.data() : null
+  }
+
+  async updateUser(userId: string, updates: Partial<User>) {
+    await this.firetype.users.getDocumentRef(userId, true).update({
+      ...updates,
+      updatedAt: new Date(),
+    })
+  }
+
+  async deleteUser(userId: string) {
+    await this.firetype.users.getDocumentRef(userId).delete()
+  }
+
+  async getUsersByRole(role: "user" | "admin" | "moderator") {
+    const snapshot = await this.firetype.users
+      .getCollectionRef()
+      .where("role", "==", role)
+      .get()
+
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  }
+}
+```
+
+## Blog System with Subcollections
+
+### Schema Structure
+
+```
+schemas/database/
+├── posts/
+│   └── schema.ts
+├── users/
+│   ├── schema.ts
+│   └── posts/
+│       └── schema.ts (for user drafts)
+└── comments/
+    └── schema.ts
+```
+
+```typescript
+// schemas/database/posts/schema.ts
+import { z } from "zod"
+import { firestoreRef } from "@anonymous-dev/firetype"
+
+export const schema = z.object({
+  title: z.string().min(1).max(200),
+  slug: z.string().regex(/^[a-z0-9-]+$/),
+  content: z.string().min(1),
+  excerpt: z.string().max(300).optional(),
+  authorId: z.string(),
+  author: firestoreRef("users"),
+  tags: z.array(z.string()).default([]),
+  category: z
+    .enum(["tutorial", "news", "opinion", "review"])
+    .default("tutorial"),
+  status: z.enum(["draft", "published", "archived"]).default("draft"),
+  publishedAt: z.date().optional(),
+  featured: z.boolean().default(false),
+  viewCount: z.number().int().default(0),
+  likeCount: z.number().int().default(0),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+})
+```
+
+```typescript
+// schemas/database/comments/schema.ts
+import { z } from "zod"
+import { firestoreRef } from "@anonymous-dev/firetype"
+
+export const schema = z.object({
+  postId: z.string(),
+  post: firestoreRef("posts"),
+  authorId: z.string(),
+  author: firestoreRef("users"),
+  content: z.string().min(1).max(2000),
+  parentId: z.string().optional(), // For nested replies
+  likes: z.number().int().default(0),
+  edited: z.boolean().default(false),
+  editedAt: z.date().optional(),
+  createdAt: z.date(),
+})
+```
+
+### Blog Service Implementation
+
+```typescript
+class BlogService {
+  private firetype = createFireTypeAdmin(getFirestore())
+
+  async createPost(postData: Omit<Post, "createdAt" | "updatedAt" | "slug">) {
+    const slug = this.generateSlug(postData.title)
+    const now = new Date()
+
+    const post = {
+      ...postData,
+      slug,
+      createdAt: now,
+      updatedAt: now,
+    }
+
+    const docRef = await this.firetype.posts.getCollectionRef(true).add(post)
+    return { id: docRef.id, slug }
+  }
+
+  async publishPost(postId: string) {
+    await this.firetype.posts.getDocumentRef(postId).update({
+      status: "published",
+      publishedAt: new Date(),
+      updatedAt: new Date(),
+    })
+  }
+
+  async getPublishedPosts(limit = 10) {
+    const snapshot = await this.firetype.posts
+      .getCollectionRef()
+      .where("status", "==", "published")
+      .orderBy("publishedAt", "desc")
+      .limit(limit)
+      .get()
+
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  }
+
+  async addComment(
+    postId: string,
+    commentData: Omit<Comment, "postId" | "createdAt">
+  ) {
+    const comment = {
+      ...commentData,
+      postId,
+      createdAt: new Date(),
+    }
+
+    const docRef = await this.firetype.comments
+      .getCollectionRef(true)
+      .add(comment)
+    return docRef.id
+  }
+
+  async getPostComments(postId: string) {
+    const snapshot = await this.firetype.comments
+      .getCollectionRef()
+      .where("postId", "==", postId)
+      .orderBy("createdAt", "asc")
+      .get()
+
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  }
+
+  private generateSlug(title: string): string {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+  }
+}
+```
+
+## E-commerce Product Catalog
+
+### Product Schema with Variants
+
+```typescript
+// schemas/database/products/schema.ts
+import { z } from "zod"
+import { firestoreRef } from "@anonymous-dev/firetype"
+
+export const schema = z.object({
+  name: z.string().min(1).max(100),
+  description: z.string().min(1).max(2000),
+  sku: z.string().regex(/^[A-Z0-9]{8,12}$/),
+  price: z.number().positive(),
+  compareAtPrice: z.number().positive().optional(),
+  currency: z.enum(["USD", "EUR", "GBP"]).default("USD"),
+  inventory: z.object({
+    quantity: z.number().int().min(0),
+    lowStockThreshold: z.number().int().min(1).default(10),
+    trackInventory: z.boolean().default(true),
+  }),
+  images: z
+    .array(
+      z.object({
+        url: z.string().url(),
+        alt: z.string(),
+        position: z.number().int().min(0),
+      })
+    )
+    .default([]),
+  categories: z.array(firestoreRef("categories")).min(1),
+  tags: z.array(z.string()).default([]),
+  attributes: z.record(z.string()).default({}),
+  variants: z
+    .array(
+      z.object({
+        name: z.string(),
+        value: z.string(),
+        priceModifier: z.number().default(0),
+      })
+    )
+    .default([]),
+  seo: z
+    .object({
+      title: z.string().max(60).optional(),
+      description: z.string().max(160).optional(),
+      keywords: z.array(z.string()).default([]),
+    })
+    .optional(),
+  status: z.enum(["active", "inactive", "discontinued"]).default("active"),
+  featured: z.boolean().default(false),
+  weight: z.number().positive().optional(),
+  dimensions: z
+    .object({
+      length: z.number().positive(),
+      width: z.number().positive(),
+      height: z.number().positive(),
+      unit: z.enum(["cm", "in"]).default("cm"),
+    })
+    .optional(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+})
+```
+
+### Category Schema
+
+```typescript
+// schemas/database/categories/schema.ts
+import { z } from "zod"
+
+export const schema = z.object({
+  name: z.string().min(1).max(50),
+  slug: z.string().regex(/^[a-z0-9-]+$/),
+  description: z.string().max(500).optional(),
+  parentId: z.string().optional(),
+  image: z.string().url().optional(),
+  displayOrder: z.number().int().default(0),
+  featured: z.boolean().default(false),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+})
+```
+
+### E-commerce Service
+
+```typescript
+class ProductService {
+  private firetype = createFireTypeAdmin(getFirestore())
+
+  async createProduct(productData: Omit<Product, "createdAt" | "updatedAt">) {
+    const now = new Date()
+    const product = {
+      ...productData,
+      createdAt: now,
+      updatedAt: now,
+    }
+
+    const docRef = await this.firetype.products
+      .getCollectionRef(true)
+      .add(product)
+    return docRef.id
+  }
+
+  async getProductsByCategory(categoryId: string) {
+    const snapshot = await this.firetype.products
+      .getCollectionRef()
+      .where("categories", "array-contains", categoryId)
+      .where("status", "==", "active")
+      .get()
+
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  }
+
+  async searchProducts(query: string, limit = 20) {
+    // Note: This is a simplified search. For production, consider using Algolia or similar
+    const snapshot = await this.firetype.products
+      .getCollectionRef()
+      .where("status", "==", "active")
+      .where("name", ">=", query)
+      .where("name", "<=", query + "\uf8ff")
+      .limit(limit)
+      .get()
+
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  }
+
+  async updateInventory(productId: string, newQuantity: number) {
+    const productRef = this.firetype.products.getDocumentRef(productId)
+    const product = await productRef.get()
+
+    if (!product.exists) {
+      throw new Error("Product not found")
+    }
+
+    const currentInventory = product.data().inventory
+    await productRef.update({
+      inventory: {
+        ...currentInventory,
+        quantity: newQuantity,
+      },
+      updatedAt: new Date(),
+    })
+  }
+}
+```
+
+## Real-time Subscriptions (Client-side)
+
+```typescript
+// React hook for real-time product updates
+import { useEffect, useState } from "react"
+import { createFireTypeClient } from "../types"
+import { getFirestore, onSnapshot } from "firebase/firestore"
+
+export function useProduct(productId: string) {
+  const [product, setProduct] = useState<Product | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
+
+  useEffect(() => {
+    const firetype = createFireTypeClient(getFirestore())
+    const productRef = firetype.products.getDocumentRef(productId)
+
+    const unsubscribe = onSnapshot(
+      productRef,
+      doc => {
+        setProduct(doc.exists ? doc.data() : null)
+        setLoading(false)
+      },
+      err => {
+        setError(err)
+        setLoading(false)
+      }
+    )
+
+    return unsubscribe
+  }, [productId])
+
+  return { product, loading, error }
+}
+
+// Real-time inventory tracking
+export function useProductInventory(productId: string) {
+  const [inventory, setInventory] = useState<Product["inventory"] | null>(null)
+
+  useEffect(() => {
+    const firetype = createFireTypeClient(getFirestore())
+    const productRef = firetype.products.getDocumentRef(productId)
+
+    const unsubscribe = onSnapshot(productRef, doc => {
+      if (doc.exists) {
+        setInventory(doc.data().inventory)
+      }
+    })
+
+    return unsubscribe
+  }, [productId])
+
+  return inventory
+}
+```
+
+## Advanced Patterns
+
+### Polymorphic Collections
+
+```typescript
+// schemas/database/activities/schema.ts
+import { z } from "zod"
+import { firestoreRef } from "@anonymous-dev/firetype"
+
+const baseActivity = z.object({
+  userId: z.string(),
+  user: firestoreRef("users"),
+  timestamp: z.date(),
+  public: z.boolean().default(true),
+})
+
+export const schema = z.discriminatedUnion("type", [
+  baseActivity.extend({
+    type: z.literal("post_created"),
+    postId: z.string(),
+    post: firestoreRef("posts"),
+    title: z.string(),
+  }),
+  baseActivity.extend({
+    type: z.literal("comment_added"),
+    commentId: z.string(),
+    comment: firestoreRef("comments"),
+    postId: z.string(),
+    post: firestoreRef("posts"),
+  }),
+  baseActivity.extend({
+    type: z.literal("user_followed"),
+    followedUserId: z.string(),
+    followedUser: firestoreRef("users"),
+  }),
+])
+```
+
+### Batch Operations
+
+```typescript
+class BatchService {
+  private firetype = createFireTypeAdmin(getFirestore())
+
+  async bulkUpdateUserRoles(userIds: string[], newRole: "user" | "admin") {
+    const batch = getFirestore().batch()
+
+    for (const userId of userIds) {
+      const userRef = this.firetype.users.getDocumentRef(userId)
+      batch.update(userRef, {
+        role: newRole,
+        updatedAt: new Date(),
+      })
+    }
+
+    await batch.commit()
+  }
+
+  async migratePostsToNewCategory(
+    oldCategoryId: string,
+    newCategoryId: string
+  ) {
+    const batch = getFirestore().batch()
+
+    const postsSnapshot = await this.firetype.posts
+      .getCollectionRef()
+      .where("categories", "array-contains", oldCategoryId)
+      .get()
+
+    postsSnapshot.docs.forEach(doc => {
+      const postRef = doc.ref
+      const currentCategories = doc.data().categories
+
+      const updatedCategories = currentCategories.map(cat =>
+        cat.id === oldCategoryId ? newCategoryId : cat
+      )
+
+      batch.update(postRef, {
+        categories: updatedCategories,
+        updatedAt: new Date(),
+      })
+    })
+
+    await batch.commit()
+  }
+}
+```
+
+### Type-safe Transaction
+
+```typescript
+async function transferInventory(
+  fromProductId: string,
+  toProductId: string,
+  quantity: number
+) {
+  const firetype = createFireTypeAdmin(getFirestore())
+
+  await getFirestore().runTransaction(async transaction => {
+    const fromRef = firetype.products.getDocumentRef(fromProductId)
+    const toRef = firetype.products.getDocumentRef(toProductId)
+
+    const fromDoc = await transaction.get(fromRef)
+    const toDoc = await transaction.get(toRef)
+
+    if (!fromDoc.exists || !toDoc.exists) {
+      throw new Error("Product not found")
+    }
+
+    const fromData = fromDoc.data()
+    const toData = toDoc.data()
+
+    if (fromData.inventory.quantity < quantity) {
+      throw new Error("Insufficient inventory")
+    }
+
+    transaction.update(fromRef, {
+      inventory: {
+        ...fromData.inventory,
+        quantity: fromData.inventory.quantity - quantity,
+      },
+      updatedAt: new Date(),
+    })
+
+    transaction.update(toRef, {
+      inventory: {
+        ...toData.inventory,
+        quantity: toData.inventory.quantity + quantity,
+      },
+      updatedAt: new Date(),
+    })
+  })
+}
+```

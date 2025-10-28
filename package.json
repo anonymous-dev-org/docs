@@ -1,0 +1,22 @@
+{
+  "name": "docs",
+  "version": "0.0.0",
+  "description": "Use the starter kit to get your docs deployed and ready to customize.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anonymous-dev-org/docs.git"
+  },
+  "author": "anonymous-dev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/anonymous-dev-org/docs/issues"
+  },
+  "homepage": "https://github.com/anonymous-dev-org/docs#readme",
+  "dependencies": {
+    "mint": "^4.2.182"
+  }
+}

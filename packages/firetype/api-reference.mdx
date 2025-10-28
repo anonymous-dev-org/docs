@@ -1,0 +1,330 @@
+---
+title: "API Reference"
+description: "Complete API documentation with examples and type definitions"
+icon: "book-open"
+---
+
+# 🔧 API Reference
+
+Firetype generates fully typed APIs that mirror your Firestore database structure. Here's a comprehensive reference of the generated functions and types.
+
+## Generated Functions
+
+### `createFireTypeAdmin(firestoreInstance)`
+
+Creates a type-safe Firestore API for server-side operations using the Firebase Admin SDK.
+
+**Parameters:**
+
+- `firestoreInstance`: Firebase Admin Firestore instance
+
+**Returns:** Type-safe API object matching your schema structure
+
+### `createFireTypeClient(firestoreInstance)`
+
+Creates a type-safe Firestore API for client-side operations using the Firebase Web SDK.
+
+**Parameters:**
+
+- `firestoreInstance`: Firebase Client Firestore instance
+
+**Returns:** Type-safe API object matching your schema structure
+
+## API Structure
+
+The generated API mirrors your directory structure. For this schema structure:
+
+```
+schemas/database/
+├── users/
+│   ├── schema.ts
+│   └── posts/
+│       └── schema.ts
+└── posts/
+    └── schema.ts
+```
+
+You get this typed API:
+
+```typescript
+const firetype = createFireTypeAdmin(db)
+
+firetype.users // /users collection API
+firetype.users.posts // /users/{userId}/posts subcollection API
+firetype.posts // /posts collection API
+```
+
+## Collection API Methods
+
+### `getCollectionRef(validate?: boolean)`
+
+Returns a typed Firestore collection reference.
+
+**Parameters:**
+
+- `validate` (boolean, optional): Enable runtime validation (default: false)
+
+**Returns:**
+
+- Admin: `AdminCollectionReference<T>`
+- Client: `ClientCollectionReference<T>`
+
+**Example:**
+
+```typescript
+const usersRef = firetype.users.getCollectionRef(true) // With validation
+const usersRef = firetype.users.getCollectionRef() // Without validation
+```
+
+### `getDocumentRef(documentId, validate?: boolean)`
+
+Returns a typed Firestore document reference.
+
+**Parameters:**
+
+- `documentId` (string): The document ID
+- `validate` (boolean, optional): Enable runtime validation (default: false)
+
+**Returns:**
+
+- Admin: `AdminDocumentReference<T>`
+- Client: `ClientDocumentReference<T>`
+
+**Example:**
+
+```typescript
+const userDoc = firetype.users.getDocumentRef("user123", true)
+```
+
+### `getCollectionGroupRef(validate?: boolean)`
+
+Returns a typed collection group reference for querying across all subcollections.
+
+**Parameters:**
+
+- `validate` (boolean, optional): Enable runtime validation (default: false)
+
+**Returns:**
+
+- Admin: `AdminCollectionGroup<T>`
+- Client: `ClientQuery<T>`
+
+**Example:**
+
+```typescript
+// Query all posts across all users
+const allPosts = firetype.users.posts.getCollectionGroupRef()
+const recentPosts = await allPosts
+  .where("published", "==", true)
+  .orderBy("createdAt", "desc")
+  .limit(10)
+  .get()
+```
+
+## Subcollection API Methods
+
+For subcollections, the API methods require parent document IDs:
+
+### `getCollectionRef(args, validate?: boolean)`
+
+**Parameters:**
+
+- `args`: Object containing parent document IDs (e.g., `{ usersId: "user123" }`)
+- `validate` (boolean, optional): Enable runtime validation (default: false)
+
+**Example:**
+
+```typescript
+// Get posts for a specific user
+const userPostsRef = firetype.users.posts.getCollectionRef({
+  usersId: "user123",
+})
+```
+
+### `getDocumentRef(args, documentId, validate?: boolean)`
+
+**Parameters:**
+
+- `args`: Object containing parent document IDs
+- `documentId` (string): The document ID
+- `validate` (boolean, optional): Enable runtime validation (default: false)
+
+**Example:**
+
+```typescript
+// Get a specific post from a user
+const userPostDoc = firetype.users.posts.getDocumentRef(
+  { usersId: "user123" },
+  "post456"
+)
+```
+
+## Validation
+
+Firetype supports optional runtime validation using your Zod schemas:
+
+```typescript
+// Enable validation for all operations
+const firetype = createFireTypeAdmin(db)
+
+// Collection operations with validation
+const usersRef = firetype.users.getCollectionRef(true)
+
+// Document operations with validation
+const userDoc = firetype.users.getDocumentRef("user123", true)
+
+// Invalid data will throw Zod validation errors
+await usersRef.add({
+  name: "", // ❌ Fails validation (empty string)
+  email: "invalid", // ❌ Fails validation (not email)
+  createdAt: new Date(),
+})
+```
+
+## Type Safety
+
+All generated APIs are fully type-safe:
+
+```typescript
+// TypeScript knows the exact shape of your data
+const user = await userDoc.get()
+const userData = user.data()
+// userData is typed as your User schema type
+
+// Autocomplete and type checking for all fields
+userData.name // string
+userData.email // string
+userData.age // number | undefined
+userData.metadata // { lastLogin?: Date; isVerified: boolean; ... }
+```
+
+## Error Handling
+
+Firetype throws descriptive errors for common issues:
+
+- **Validation errors**: Zod validation errors when validation is enabled
+- **Schema errors**: Issues with your schema definitions
+- **Firestore errors**: Standard Firestore SDK errors are passed through
+
+```typescript
+try {
+  await usersRef.add(invalidUserData)
+} catch (error) {
+  if (error instanceof z.ZodError) {
+    console.log("Validation failed:", error.errors)
+  } else {
+    console.log("Firestore error:", error)
+  }
+}
+```
+
+## Generated Types
+
+### Schema Types
+
+For each schema file, Firetype generates:
+
+- **Document type**: The TypeScript type for your document data
+- **Create type**: Type for creating new documents (with optional fields)
+- **Update type**: Type for updating existing documents
+
+### Reference Types
+
+- `firestoreRef(path)`: Creates strongly-typed document references
+- `collectionPath(path)`: Creates branded collection path types
+
+### SDK-Specific Types
+
+**Admin SDK:**
+
+- `AdminCollectionReference<T>`
+- `AdminDocumentReference<T>`
+- `AdminCollectionGroup<T>`
+
+**Client SDK:**
+
+- `ClientCollectionReference<T>`
+- `ClientDocumentReference<T>`
+- `ClientQuery<T>`
+
+## Helper Functions
+
+### `firestoreRef(collectionPath)`
+
+Creates a strongly-typed Firestore document reference field.
+
+```typescript
+import { firestoreRef } from "@anonymous-dev/firetype"
+
+const schema = z.object({
+  userRef: firestoreRef("users"),
+  postRef: firestoreRef("users/posts"),
+})
+```
+
+### `collectionPath(path)`
+
+Creates a branded collection path for better type safety.
+
+```typescript
+import { collectionPath, type CollectionPath } from "@anonymous-dev/firetype"
+
+const userPath: CollectionPath = collectionPath("users")
+```
+
+## Best Practices
+
+### Validation Strategy
+
+```typescript
+// Development: Enable validation everywhere
+const firetype = createFireTypeAdmin(db)
+const usersRef = firetype.users.getCollectionRef(true)
+
+// Production: Disable validation for performance
+const usersRef = firetype.users.getCollectionRef(false)
+```
+
+### Error Handling Patterns
+
+```typescript
+// Centralized error handling
+async function createUser(userData: UserCreate) {
+  try {
+    const docRef = await firetype.users.getCollectionRef(true).add(userData)
+    return { success: true, id: docRef.id }
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        errors: error.errors.map(e => ({
+          field: e.path.join("."),
+          message: e.message,
+        })),
+      }
+    }
+    throw error // Re-throw Firestore errors
+  }
+}
+```
+
+### Type-Safe Queries
+
+```typescript
+// Collection group queries
+const allPosts = firetype.users.posts.getCollectionGroupRef()
+
+// Type-safe where clauses
+const publishedPosts = await allPosts
+  .where("published", "==", true)
+  .where("createdAt", ">", new Date(Date.now() - 86400000)) // Last 24h
+  .orderBy("createdAt", "desc")
+  .limit(10)
+  .get()
+
+// Fully typed results
+publishedPosts.docs.forEach(doc => {
+  const post = doc.data()
+  // post is fully typed with your Post schema
+})
+```

@@ -1,0 +1,299 @@
+---
+title: "Troubleshooting"
+description: "Common issues and their solutions for Firetype"
+icon: "wrench"
+---
+
+# 🔍 Troubleshooting
+
+Common issues and their solutions when working with Firetype.
+
+## Common Issues
+
+### "Cannot find module" errors
+
+**Problem**: TypeScript can't find the generated types.
+
+**Solution**: Make sure you've generated types before importing them:
+
+```bash
+npx @anonymous-dev/firetype generate --input=./schemas --output=./types
+```
+
+### Schema validation errors
+
+**Problem**: Your schema files aren't being recognized.
+
+**Solutions**:
+
+- Ensure schema files export a `schema` constant: `export const schema = z.object({...})`
+- Check that schema files are named exactly `schema.ts`
+- Verify the directory structure matches your Firestore collections
+
+### CLI not found
+
+**Problem**: `firetype` command not recognized.
+
+**Solutions**:
+
+- Use `npx @anonymous-dev/firetype` instead of `firetype`
+- Check that the package is installed: `npm list @anonymous-dev/firetype`
+- For local installation, ensure your `PATH` includes node_modules/.bin
+
+### Type errors in generated code
+
+**Problem**: TypeScript errors in the generated index.ts file.
+
+**Solutions**:
+
+- Update to the latest version: `npm update @anonymous-dev/firetype`
+- Regenerate types after schema changes
+- Check that your Zod schemas are valid
+
+### Validation not working
+
+**Problem**: Runtime validation isn't catching invalid data.
+
+**Solution**: Enable validation explicitly:
+
+```typescript
+// Enable validation
+const collectionRef = firetype.users.getCollectionRef(true)
+const documentRef = firetype.users.getDocumentRef("id", true)
+```
+
+### Import errors
+
+**Problem**: Can't import from the generated types.
+
+**Solutions**:
+
+- Check the output path in your generation command
+- Ensure the generated file exists: `ls types/index.ts`
+- Use correct relative imports: `import { createFireTypeAdmin } from "../types"`
+
+## Schema Issues
+
+### Schema not generating types
+
+**Symptoms**: Schema files exist but no types are generated for them.
+
+**Check**:
+
+1. **File naming**: Ensure files are named exactly `schema.ts`
+2. **Export syntax**: Must be `export const schema = z.object({...})`
+3. **Directory structure**: Should match your Firestore collection structure
+4. **CLI paths**: Verify `--input` path points to the correct directory
+
+**Example**:
+
+```
+✅ Correct:
+schemas/database/users/schema.ts
+export const schema = z.object({...})
+
+❌ Incorrect:
+schemas/database/users/userSchema.ts
+export const userSchema = z.object({...})
+```
+
+### Type safety not working
+
+**Problem**: Generated types don't provide expected type safety.
+
+**Solutions**:
+
+1. **Regenerate types** after schema changes
+2. **Check Zod schema validity** - invalid schemas may generate `any` types
+3. **Verify import paths** in generated file
+4. **Update TypeScript** to latest version
+
+### Complex schema types
+
+**Problem**: Union types, discriminated unions, or complex validations not working.
+
+**Check**:
+
+```typescript
+// ✅ Correct discriminated union
+export const schema = z.discriminatedUnion("type", [
+  z.object({ type: z.literal("a"), value: z.string() }),
+  z.object({ type: z.literal("b"), value: z.number() }),
+])
+
+// ❌ Incorrect - missing discriminator
+export const schema = z.union([
+  z.object({ type: z.literal("a"), value: z.string() }),
+  z.object({ type: z.literal("b"), value: z.number() }),
+])
+```
+
+## Runtime Issues
+
+### Validation errors not descriptive
+
+**Problem**: Zod errors are not helpful for debugging.
+
+**Solution**: Use detailed error formatting:
+
+```typescript
+try {
+  await collectionRef.add(data)
+} catch (error) {
+  if (error instanceof z.ZodError) {
+    const formattedErrors = error.errors.map(err => ({
+      field: err.path.join("."),
+      code: err.code,
+      message: err.message,
+      received: err.received,
+    }))
+    console.error("Validation failed:", formattedErrors)
+  }
+}
+```
+
+### Firestore permission errors
+
+**Problem**: Operations fail with permission denied errors.
+
+**Solutions**:
+
+1. **Check Firestore rules** - ensure rules allow the operations
+2. **Verify authentication** - user must be authenticated for secured operations
+3. **Test with admin SDK** - bypasses security rules for testing
+
+### Performance issues
+
+**Problem**: Firetype operations are slow.
+
+**Solutions**:
+
+1. **Disable validation in production**:
+
+   ```typescript
+   const collectionRef = firetype.users.getCollectionRef(false) // No validation
+   ```
+
+2. **Use batch operations** for multiple writes:
+
+   ```typescript
+   const batch = db.batch()
+   // Add multiple operations to batch
+   await batch.commit()
+   ```
+
+3. **Optimize queries** with proper indexes
+
+## CLI Issues
+
+### Command not found in CI/CD
+
+**Problem**: `npx @anonymous-dev/firetype` fails in CI environment.
+
+**Solutions**:
+
+1. **Add to package.json**:
+
+   ```json
+   {
+     "scripts": {
+       "generate-types": "firetype generate --input=./schemas --output=./types"
+     },
+     "devDependencies": {
+       "@anonymous-dev/firetype": "^1.2.0"
+     }
+   }
+   ```
+
+2. **Use npm script**: `npm run generate-types`
+
+3. **Cache node_modules** in CI to avoid reinstallation
+
+### Debug mode
+
+Enable verbose logging:
+
+```bash
+DEBUG=firetype npx @anonymous-dev/firetype generate --input=./schemas --output=./types
+```
+
+## Getting Help
+
+### Issue Reporting
+
+When reporting bugs, please include:
+
+- **Version**: Firetype version (`npm list @anonymous-dev/firetype`)
+- **Environment**: Node.js, TypeScript, Firebase SDK versions
+- **Steps to reproduce**: Minimal code example
+- **Expected vs actual behavior**
+- **Schema structure** (anonymized)
+
+### Minimal Reproduction
+
+Create a minimal project that reproduces the issue:
+
+```bash
+mkdir firetype-debug
+cd firetype-debug
+npm init -y
+npm install @anonymous-dev/firetype zod firebase-admin
+mkdir schemas
+# Add minimal schema and reproduction code
+```
+
+### Community Support
+
+- **GitHub Issues**: For bugs and feature requests
+- **GitHub Discussions**: For questions and general help
+- **Stack Overflow**: Tag with `firetype` and `firestore`
+
+## Advanced Debugging
+
+### Type Inspection
+
+Inspect generated types using TypeScript's utility types:
+
+```typescript
+// Check what types are generated
+type UserType = Parameters<typeof createFireTypeAdmin>[0] extends Firestore
+  ? Awaited<
+      ReturnType<
+        ReturnType<typeof createFireTypeAdmin>["users"]["getCollectionRef"]
+      >
+    >["_documentType"]
+  : never
+```
+
+### Runtime Type Checking
+
+Add runtime type validation for debugging:
+
+```typescript
+import { z } from "zod"
+
+// Debug helper
+function validateSchema<T>(schema: z.ZodSchema<T>, data: unknown): T {
+  try {
+    return schema.parse(data)
+  } catch (error) {
+    console.error("Schema validation failed:", error)
+    throw error
+  }
+}
+
+// Use in your operations
+const validData = validateSchema(userSchema, inputData)
+await collectionRef.add(validData)
+```
+
+### Performance Profiling
+
+Profile Firetype operations:
+
+```typescript
+const start = performance.now()
+const result = await firetype.users.getCollectionRef().get()
+const end = performance.now()
+console.log(`Query took ${end - start} milliseconds`)
+```

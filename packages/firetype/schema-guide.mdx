@@ -1,0 +1,287 @@
+---
+title: "Schema Definition Guide"
+description: "Learn how to define Firestore schemas with Zod for full type safety"
+icon: "file-code"
+---
+
+# 📋 Schema Definition
+
+Firetype uses Zod schemas to define your Firestore collection and document structures. Organize your schemas in a directory structure that mirrors your Firestore database hierarchy.
+
+## Directory Structure
+
+```
+schemas/
+└── database/
+    ├── users/
+    │   ├── schema.ts          # /users collection
+    │   └── posts/
+    │       └── schema.ts      # /users/{userId}/posts subcollection
+    ├── posts/
+    │   └── schema.ts          # /posts collection
+    └── comments/
+        └── schema.ts          # /comments collection
+```
+
+## Basic Collection Schema
+
+Each schema file must export a `schema` constant using Zod:
+
+```typescript
+// schemas/database/users/schema.ts
+import { z } from "zod"
+
+export const schema = z.object({
+  // Required fields
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email format"),
+
+  // Optional fields
+  age: z.number().int().positive().optional(),
+  bio: z.string().max(500).optional(),
+
+  // Nested objects
+  metadata: z.object({
+    lastLogin: z.date().optional(),
+    isVerified: z.boolean().default(false),
+    role: z.enum(["user", "admin", "moderator"]).default("user"),
+  }),
+
+  // Arrays
+  interests: z.array(z.string()).default([]),
+
+  // Complex types
+  preferences: z
+    .record(z.union([z.string(), z.number(), z.boolean()]))
+    .optional(),
+
+  // Timestamps
+  createdAt: z.date(),
+  updatedAt: z.date(),
+})
+```
+
+## Subcollection Schema
+
+Define subcollections by creating nested directories:
+
+```typescript
+// schemas/database/users/posts/schema.ts
+import { z } from "zod"
+
+export const schema = z.object({
+  title: z.string().min(1, "Title is required"),
+  content: z.string().min(1, "Content is required"),
+  excerpt: z.string().max(200).optional(),
+  published: z.boolean().default(false),
+  publishedAt: z.date().optional(),
+  tags: z.array(z.string()).default([]),
+  likes: z.number().int().default(0),
+  authorId: z.string(), // Reference to parent document
+  createdAt: z.date(),
+  updatedAt: z.date(),
+})
+```
+
+## Advanced Schema Patterns
+
+### Union Types (Polymorphism)
+
+```typescript
+// schemas/database/notifications/schema.ts
+import { z } from "zod"
+
+const baseNotification = z.object({
+  id: z.string(),
+  userId: z.string(),
+  read: z.boolean().default(false),
+  createdAt: z.date(),
+})
+
+export const schema = z.discriminatedUnion("type", [
+  baseNotification.extend({
+    type: z.literal("friend_request"),
+    fromUserId: z.string(),
+    message: z.string(),
+  }),
+  baseNotification.extend({
+    type: z.literal("post_like"),
+    postId: z.string(),
+    likerId: z.string(),
+  }),
+  baseNotification.extend({
+    type: z.literal("comment_reply"),
+    commentId: z.string(),
+    postId: z.string(),
+    replierId: z.string(),
+  }),
+])
+```
+
+## Firestore References
+
+Firetype supports strongly-typed Firestore document references using the `firestoreRef` helper:
+
+```typescript
+// schemas/database/posts/schema.ts
+import { z } from "zod"
+import { firestoreRef, collectionPath } from "@anonymous-dev/firetype"
+
+export const schema = z.object({
+  title: z.string().min(1, "Title is required"),
+  content: z.string().min(1, "Content is required"),
+  authorId: z.string(),
+
+  // Single reference to a user document
+  authorRef: firestoreRef("users"),
+
+  // Array of references to user documents
+  collaboratorRefs: firestoreRef("users").array(),
+
+  // Reference to a different collection
+  categoryRef: firestoreRef("categories"),
+
+  // Reference to subcollections
+  commentRef: firestoreRef("users/comments"),
+
+  // Using branded collection paths for better type safety
+  centerRef: firestoreRef(collectionPath("centers")),
+
+  publishedAt: z.date(),
+  tags: z.array(z.string()).default([]),
+  isPublished: z.boolean().default(false),
+})
+```
+
+You can use dynamic path segments for documentation purposes:
+
+```typescript
+export const schema = z.object({
+  // Path with dynamic segment (for documentation)
+  userPostRef: firestoreRef("users/:userId/posts"),
+
+  // This resolves to the same type as firestoreRef("users/posts")
+  // The :userId segment is filtered out during processing
+})
+```
+
+References automatically resolve to properly typed `DocumentReference` objects:
+
+```typescript
+// Server-side (Admin SDK)
+const firetype = createFireTypeAdmin(db)
+const post = await firetype.posts.getDocumentRef("post123").get()
+const postData = post.data()
+// postData.authorRef is typed as AdminDocumentReference<UserSchema>
+// postData.collaboratorRefs is typed as AdminDocumentReference<UserSchema>[]
+// postData.commentRef is typed as AdminDocumentReference<CommentSchema>
+
+// Client-side (Web SDK)
+const firetype = createFireTypeClient(db)
+const post = await firetype.posts.getDocumentRef("post123").get()
+const postData = post.data()
+// postData.authorRef is typed as ClientDocumentReference<UserSchema>
+// postData.collaboratorRefs is typed as ClientDocumentReference<UserSchema>[]
+// postData.commentRef is typed as ClientDocumentReference<CommentSchema>
+```
+
+The generated types also include a union type of all valid collection paths for better development experience:
+
+```typescript
+// Generated type for type safety
+export type DatabaseCollectionPaths =
+  | "accounts"
+  | "centers"
+  | "matches"
+  | "posts"
+  | "users"
+  | "users/comments"
+```
+
+## Collection Path Types
+
+For better type safety, you can use the `CollectionPath` type and `collectionPath` helper:
+
+```typescript
+import {
+  firestoreRef,
+  collectionPath,
+  type CollectionPath,
+} from "@anonymous-dev/firetype"
+
+// Create branded collection paths
+const userPath: CollectionPath = collectionPath("users")
+const postPath: CollectionPath = collectionPath("users/posts")
+
+// Use with firestoreRef
+const schema = z.object({
+  userRef: firestoreRef(userPath),
+  postRef: firestoreRef(postPath),
+})
+```
+
+## Complex Validation
+
+```typescript
+// schemas/database/products/schema.ts
+import { z } from "zod"
+
+export const schema = z
+  .object({
+    name: z.string().min(1).max(100),
+    description: z.string().max(1000),
+    price: z.number().positive(),
+    currency: z.enum(["USD", "EUR", "GBP"]).default("USD"),
+
+    // Conditional validation
+    salePrice: z.number().positive().optional(),
+    onSale: z.boolean().default(false),
+
+    // Custom validation
+    inventory: z.object({
+      quantity: z.number().int().min(0),
+      lowStockThreshold: z.number().int().min(1).default(10),
+      sku: z.string().regex(/^[A-Z0-9]{8,12}$/, "Invalid SKU format"),
+    }),
+
+    // Geopoint (use object for Firestore GeoPoint)
+    location: z
+      .object({
+        latitude: z.number().min(-90).max(90),
+        longitude: z.number().min(-180).max(180),
+      })
+      .optional(),
+
+    categories: z.array(z.string()).min(1, "At least one category required"),
+    tags: z.array(z.string()).default([]),
+
+    createdAt: z.date(),
+    updatedAt: z.date(),
+  })
+  .refine(
+    data => !data.onSale || (data.salePrice && data.salePrice < data.price),
+    {
+      message: "Sale price must be less than regular price when on sale",
+      path: ["salePrice"],
+    }
+  )
+```
+
+## Schema Best Practices
+
+- **Use descriptive names**: Choose clear, descriptive names for your collections and fields
+- **Add validation**: Leverage Zod's validation features to ensure data integrity
+- **Use enums**: For fields with a fixed set of values, use `z.enum()` instead of strings
+- **Default values**: Provide sensible defaults for optional fields
+- **Firestore references**: Use `firestoreRef()` for strongly-typed document references
+- **Collection paths**: Use `collectionPath()` helper for better type safety with references
+- **Dynamic path segments**: Use `:param` syntax in paths for documentation (e.g., `"users/:userId/posts"`)
+- **Type references**: Use TypeScript types when referencing other document IDs
+- **Custom validation**: Add business logic validation using Zod's `.refine()` method
+- **Keep it DRY**: Extract common schema parts into reusable constants
+
+<Note>
+  💡 **Pro Tip**: Your Zod schemas serve as both runtime validators and
+  TypeScript type generators. Well-crafted schemas provide excellent developer
+  experience and data integrity.
+</Note>
