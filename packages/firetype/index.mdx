@@ -35,26 +35,31 @@ that automatically generates fully type-safe APIs for your Firestore collections
 
 Install Firetype using your preferred package manager:
 
-<Tabs>
-  <Tab title="npm">```bash npm install @anonymous-dev/firetype ```</Tab>
-  <Tab title="yarn">```bash yarn add @anonymous-dev/firetype ```</Tab>
-  <Tab title="pnpm">```bash pnpm add @anonymous-dev/firetype ```</Tab>
-  <Tab title="bun">```bash bun add @anonymous-dev/firetype ```</Tab>
-</Tabs>
+```bash
+# npm
+npm install @anonymous-dev/firetype
+
+# yarn
+yarn add @anonymous-dev/firetype
+
+# pnpm
+pnpm add @anonymous-dev/firetype
+
+# bun
+bun add @anonymous-dev/firetype
+```
 
 ### Peer Dependencies
 
 Firetype requires one of the following Firestore SDKs (choose based on your environment):
 
-<Tabs>
-  <Tab title="Server-side">
-    ```bash # For server-side applications (Node.js, Cloud Functions, etc.) npm install
-    firebase-admin ```
-  </Tab>
-  <Tab title="Client-side">
-    ```bash # For client-side applications (browsers, React Native, etc.) npm install firebase ```
-  </Tab>
-</Tabs>
+```bash
+# For server-side applications (Node.js, Cloud Functions, etc.)
+npm install firebase-admin
+
+# For client-side applications (browsers, React Native, etc.)
+npm install firebase
+```
 
 <Note>
   💡 **Tip**: Firetype works with both SDKs simultaneously if you need to support both client and
@@ -98,22 +103,22 @@ export const schema = z.object({
 
 Use the Firetype CLI to generate your types:
 
-<Tabs>
-  <Tab title="Both SDKs">
-    ```bash # Generate types for both admin and client SDKs npx @anonymous-dev/firetype generate
-    --input=./schemas/database --output=./types ```
-  </Tab>
-  <Tab title="Admin Only">
-    ```bash # Generate only admin SDK types npx @anonymous-dev/firetype generate --mode=admin
-    --input=./schemas --output=./types ```
-  </Tab>
-  <Tab title="Client Only">
-    ```bash # Generate only client SDK types npx @anonymous-dev/firetype generate --mode=client
-    --input=./schemas --output=./types ```
-  </Tab>
-</Tabs>
+```bash
+# Generate types for both admin and client SDKs (output written to input folder)
+npx @anonymous-dev/firetype generate --input=./schemas/database
+```
 
-This creates a `types/index.ts` file with your fully typed Firestore API.
+```bash
+# Generate only admin SDK types
+npx @anonymous-dev/firetype generate --mode=admin --input=./schemas
+```
+
+```bash
+# Generate only client SDK types
+npx @anonymous-dev/firetype generate --mode=client --input=./schemas
+```
+
+This creates an `index.ts` file in your input folder with your fully typed Firestore API.
 
 ### 4. Use in your application
 

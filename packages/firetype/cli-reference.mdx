@@ -18,42 +18,32 @@ npx @anonymous-dev/firetype generate [options]
 
 ### Options
 
-| Option            | Description                                             | Required | Default |
-| ----------------- | ------------------------------------------------------- | -------- | ------- |
-| `--input=<path>`  | Directory containing your schema definitions            | Yes      | -       |
-| `--output=<path>` | Directory where generated types will be saved           | Yes      | -       |
-| `--mode=<mode>`   | SDK mode: `admin`, `client`, or omit for both           | No       | both    |
-| `--path=<path>`   | Shorthand to set both input and output to the same path | No       | -       |
+| Option           | Description                                                                | Required | Default |
+| ---------------- | -------------------------------------------------------------------------- | -------- | ------- |
+| `--input=<path>` | Directory containing your schema definitions (output will be written here) | Yes      | -       |
+| `--mode=<mode>`  | SDK mode: `admin`, `client`, or omit for both                              | No       | both    |
 
 ### Examples
 
-<Tabs>
-  <Tab title="Both SDKs">
-    ```bash # Generate types for both SDKs npx @anonymous-dev/firetype generate --input=./schemas
-    --output=./types
-    ```
-  </Tab>
-  <Tab title="Admin Only">
-    ```bash # Generate only admin SDK types npx @anonymous-dev/firetype generate --mode=admin
-    --input=./schemas --output=./types
-    ```
-  </Tab>
-  <Tab title="Client Only" description="Generate types for the client SDK">
-    ```bash # Generate only client SDK types npx @anonymous-dev/firetype generate --mode=client
-    --input=./src/database --output=./lib/types
-    ```
-  </Tab>
-  <Tab title="Same Directory">
-    ```bash # Use shorthand for same input/output directory npx @anonymous-dev/firetype generate
-    --path=./firestore
-    ```
-  </Tab>
-  <Tab title="Nested Schemas">
-    ```bash # Organize schemas in subdirectories npx @anonymous-dev/firetype generate
-    --input=./src/schemas/firestore --output=./src/types
-    ```
-  </Tab>
-</Tabs>
+```bash
+# Generate types for both SDKs
+npx @anonymous-dev/firetype generate --input=./schemas
+```
+
+```bash
+# Generate only admin SDK types
+npx @anonymous-dev/firetype generate --mode=admin --input=./schemas
+```
+
+```bash
+# Generate only client SDK types
+npx @anonymous-dev/firetype generate --mode=client --input=./src/database
+```
+
+```bash
+# Organize schemas in subdirectories
+npx @anonymous-dev/firetype generate --input=./src/schemas/firestore
+```
 
 ## Help Command
 
@@ -65,7 +55,7 @@ npx @anonymous-dev/firetype help
 
 ## Generated Files
 
-The CLI generates an `index.ts` file in your output directory containing:
+The CLI generates an `index.ts` file in your input directory containing:
 
 - **Schema definitions**: Zod schemas compiled from your directory structure
 - **Converters**: Type-safe Firestore converters with optional validation
@@ -74,7 +64,7 @@ The CLI generates an `index.ts` file in your output directory containing:
 ### File Structure Example
 
 ```text
-types/
+schemas/
 └── index.ts          # Generated types and API functions
 ```
 
@@ -90,15 +80,15 @@ types/
 ```bash
 # Initial setup
 mkdir -p schemas/database
-npx @anonymous-dev/firetype generate --input=./schemas --output=./types
+npx @anonymous-dev/firetype generate --input=./schemas
 
 # Development loop
 # 1. Edit schemas
 # 2. Regenerate types
-npx @anonymous-dev/firetype generate --input=./schemas --output=./types
+npx @anonymous-dev/firetype generate --input=./schemas
 
 # 3. Use in your code
-import { createFireTypeAdmin } from "./types"
+import { createFireTypeAdmin } from "./schemas" // adjust path as needed
 ```
 
 ### Monorepo Setup
@@ -106,13 +96,11 @@ import { createFireTypeAdmin } from "./types"
 ```bash
 # Shared types package
 npx @anonymous-dev/firetype generate \
-  --input=./packages/database/schemas \
-  --output=./packages/types/src
+  --input=./packages/database/schemas
 
 # Application-specific types
 npx @anonymous-dev/firetype generate \
-  --input=./apps/myapp/schemas \
-  --output=./apps/myapp/src/types
+  --input=./apps/myapp/schemas
 ```
 
 ### CI/CD Integration
@@ -133,7 +121,7 @@ jobs:
         with:
           node-version: '18'
       - run: npm ci
-      - run: npx @anonymous-dev/firetype generate --input=./schemas --output=./types
+      - run: npx @anonymous-dev/firetype generate --input=./schemas
       - run: npm run type-check
 ```
 
@@ -148,7 +136,7 @@ jobs:
 **Solution**: Make sure you've generated types before importing them:
 
 ```bash
-npx @anonymous-dev/firetype generate --input=./schemas --output=./types
+npx @anonymous-dev/firetype generate --input=./schemas
 ```
 
 #### Schema validation errors
@@ -186,5 +174,5 @@ npx @anonymous-dev/firetype generate --input=./schemas --output=./types
 Enable verbose logging by setting the environment variable:
 
 ```bash
-DEBUG=firetype npx @anonymous-dev/firetype generate --input=./schemas --output=./types
+DEBUG=firetype npx @anonymous-dev/firetype generate --input=./schemas
 ```

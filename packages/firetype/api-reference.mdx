@@ -228,8 +228,10 @@ For each schema file, Firetype generates:
 
 ### Reference Types
 
-- `firestoreRef(path)`: Creates strongly-typed document references
-- `collectionPath(path)`: Creates branded collection path types
+- `firestoreRef(path?)`: Creates document reference schemas. When a path is provided, it will be
+  replaced during generation with a strongly-typed reference schema. When omitted, it behaves as a
+  permissive Zod schema at authoring time and supports composition like `z.array(firestoreRef())`.
+- `collectionPath(path)`: Generic helper that preserves literal types and brands collection paths.
 
 ### SDK-Specific Types
 
@@ -247,7 +249,7 @@ For each schema file, Firetype generates:
 
 ## Helper Functions
 
-### `firestoreRef(collectionPath)`
+### `firestoreRef(collectionPath?)`
 
 Creates a strongly-typed Firestore document reference field.
 
@@ -257,6 +259,8 @@ import { firestoreRef } from '@anonymous-dev/firetype';
 const schema = z.object({
   userRef: firestoreRef('users'),
   postRef: firestoreRef('users/posts'),
+  anyRef: firestoreRef(),
+  anyRefs: z.array(firestoreRef()),
 });
 ```
 
@@ -267,6 +271,7 @@ Creates a branded collection path for better type safety.
 ```typescript
 import { collectionPath, type CollectionPath } from '@anonymous-dev/firetype';
 
+// Generic preserves the literal type and narrows to the generated union alias
 const userPath: CollectionPath = collectionPath('users');
 ```
 
