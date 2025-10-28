@@ -1,0 +1,9 @@
+node_modules
+bun.lock
+dist
+build
+.out
+.next
+.vercel
+.cache
+

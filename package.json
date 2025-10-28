@@ -4,7 +4,9 @@
   "description": "Use the starter kit to get your docs deployed and ready to customize.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "mint dev",
+    "format": "prettier --write .",
+    "lint:mdx": "remark . --quiet --frail --ext .md,.mdx"
   },
   "repository": {
     "type": "git",
@@ -18,5 +20,15 @@
   "homepage": "https://github.com/anonymous-dev-org/docs#readme",
   "dependencies": {
     "mint": "^4.2.182"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3",
+    "remark-cli": "^11.0.0",
+    "remark-lint": "^9.1.2",
+    "remark-lint-code-block-style": "^4.0.0",
+    "remark-lint-fenced-code-flag": "^3.0.0",
+    "remark-lint-fenced-code-marker": "^3.1.1",
+    "remark-mdx": "^3.0.1",
+    "remark-preset-lint-recommended": "^7.0.0"
   }
 }
