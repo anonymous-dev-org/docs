@@ -21,7 +21,7 @@
         ]
       },
       {
-        "tab": "\ud83d\udd25 Firetype",
+        "tab": "🔥 Firetype",
         "groups": [
           {
             "group": "Getting Started",
@@ -75,7 +75,8 @@
             "pages": [
               "packages/0x0-cli/cli-reference",
               "packages/0x0-cli/environment-variables",
-              "packages/0x0-cli/server"
+              "packages/0x0-cli/server",
+              "packages/0x0-cli/complete-guide"
             ]
           }
         ]
