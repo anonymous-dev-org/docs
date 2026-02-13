@@ -14,16 +14,20 @@
         "groups": [
           {
             "group": "Welcome",
-            "pages": ["index"]
+            "pages": [
+              "index"
+            ]
           }
         ]
       },
       {
-        "tab": "🔥 Firetype",
+        "tab": "\ud83d\udd25 Firetype",
         "groups": [
           {
             "group": "Getting Started",
-            "pages": ["packages/firetype/index"]
+            "pages": [
+              "packages/firetype/index"
+            ]
           },
           {
             "group": "Guides",
@@ -35,11 +39,44 @@
           },
           {
             "group": "API Reference",
-            "pages": ["packages/firetype/api-reference"]
+            "pages": [
+              "packages/firetype/api-reference"
+            ]
           },
           {
             "group": "Help",
-            "pages": ["packages/firetype/troubleshooting"]
+            "pages": [
+              "packages/firetype/troubleshooting"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "0x0 CLI",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "packages/0x0-cli/index",
+              "packages/0x0-cli/tui-workflow"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "packages/0x0-cli/commands",
+              "packages/0x0-cli/keybinds",
+              "packages/0x0-cli/mcp-servers",
+              "packages/0x0-cli/network"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "packages/0x0-cli/cli-reference",
+              "packages/0x0-cli/environment-variables",
+              "packages/0x0-cli/server"
+            ]
           }
         ]
       }
@@ -55,11 +92,23 @@
     }
   },
   "contextual": {
-    "options": ["copy", "view", "chatgpt", "claude", "perplexity", "mcp", "cursor", "vscode"]
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   },
   "footer": {
     "socials": {
       "github": "https://github.com/anonymous-dev-org"
     }
+  },
+  "icons": {
+    "library": "lucide"
   }
 }
