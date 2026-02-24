@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "mint dev",
-    "format": "prettier --write .",
-    "lint": "remark . --frail --ext .md,.mdx"
+    "format": "biome format --write .",
+    "lint": "biome lint ."
   },
   "repository": {
     "type": "git",
@@ -22,13 +22,6 @@
     "mint": "^4.2.182"
   },
   "devDependencies": {
-    "prettier": "^3.3.3",
-    "remark-cli": "^11.0.0",
-    "remark-lint": "^9.1.2",
-    "remark-lint-code-block-style": "^4.0.0",
-    "remark-lint-fenced-code-flag": "^3.0.0",
-    "remark-lint-fenced-code-marker": "^3.1.1",
-    "remark-mdx": "^3.0.1",
-    "remark-preset-lint-recommended": "^7.0.0"
+    "@biomejs/biome": "^1.9.4"
   }
 }

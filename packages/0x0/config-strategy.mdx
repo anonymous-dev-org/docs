@@ -1,0 +1,122 @@
+---
+title: 'Config Strategy'
+description: 'Practical architecture for global and project 0x0 config'
+---
+
+Use this page to structure config so behavior stays predictable across repos.
+
+See also: [Complete Guide](/packages/0x0/complete-guide).
+
+## Layering contract
+
+- Global config: personal defaults you want in every repo (model, shared agents, shared safety
+  defaults).
+- Project config: repository truth (stack facts, test/build rules, repo-local permissions, local
+  tools).
+- Rule of thumb: if a setting would surprise you in a different repo, keep it out of global config.
+
+## Strict boundary guidance
+
+- Do not duplicate the same rule in both global and project scopes.
+- Keep stable cross-repo behavior global; keep repo policy local.
+- Prefer extending with project `knowledge_base` and `instructions` before overriding agent prompts.
+
+## Decide where config belongs
+
+| Need                         | Use                                      | Why                                  |
+| ---------------------------- | ---------------------------------------- | ------------------------------------ |
+| Short, stable repo facts     | `knowledge_base`                              | Always injected, low maintenance     |
+| Longer evolving policy docs  | `instructions`                           | Versioned in repo, easy to review    |
+| Reusable capability packs    | `skills`                                 | Portable behavior across repos       |
+| Runtime integrations/actions | custom tools (`tools`, MCP, `tool/*.ts`) | Executes actions, not prose guidance |
+
+## Strict memory pattern
+
+Recommended project pattern:
+
+- Mutable memory file: `.zeroxzero/memory.md`.
+- Stable facts: keep in `knowledge_base`.
+- Default edit policy: deny edits to memory.
+- Exception: allow only the plan agent (`agent.plan`; or your custom planner) to edit memory.
+
+```yaml
+# yaml-language-server: $schema=https://zeroxzero.ai/config.json
+$schema: https://zeroxzero.ai/config.json
+
+default_agent: plan
+
+knowledge_base:
+  - Monorepo uses Bun workspaces
+  - Primary test command is `bun test`
+
+instructions:
+  - ./.zeroxzero/policy/*.md
+  - ./.zeroxzero/memory.md
+
+permission:
+  edit:
+    .zeroxzero/memory.md: deny
+
+agent:
+  plan:
+    permission:
+      edit:
+        .zeroxzero/memory.md: allow
+```
+
+## Prompt override caution
+
+`agent.<name>.prompt` fully replaces that agent prompt in the project. Use it only when you
+intentionally want a prompt rewrite. For normal repo adaptation, prefer `knowledge_base` and
+`instructions`.
+
+## Type-safe YAML workflow
+
+1. Add schema hints in YAML files.
+2. Let `yaml-language-server` validate while editing.
+3. Rely on runtime schema validation during config load.
+4. Verify merged result with `0x0 debug config`.
+
+```yaml
+# yaml-language-server: $schema=https://zeroxzero.ai/config.json
+$schema: https://zeroxzero.ai/config.json
+```
+
+## Recommended templates
+
+Global skeleton (`~/.config/0x0/config.yaml`):
+
+```yaml
+# yaml-language-server: $schema=https://zeroxzero.ai/config.json
+$schema: https://zeroxzero.ai/config.json
+
+model: zeroxzero/gpt-5.1
+default_agent: build
+
+permission:
+  bash: ask
+  edit: ask
+  read: allow
+```
+
+Project skeleton (`./.0x0/config.yaml`):
+
+```yaml
+# yaml-language-server: $schema=https://zeroxzero.ai/config.json
+$schema: https://zeroxzero.ai/config.json
+
+model: anthropic/claude-sonnet-4
+default_agent: plan
+
+knowledge_base:
+  - This repo uses Bun workspaces
+  - Run tests with `bun test`
+
+instructions:
+  - ./.zeroxzero/policy/*.md
+
+permission:
+  bash: ask
+  edit: allow
+  read: allow
+```

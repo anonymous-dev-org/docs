@@ -1,0 +1,135 @@
+---
+title: 'Providers'
+description: 'Configure LLM providers, models, and API settings'
+icon: 'cloud'
+---
+
+0x0 bundles integrations for 20+ LLM providers. Each provider can be configured globally or per
+project with API keys, model filtering, and custom endpoints.
+
+## Bundled providers
+
+| Provider | ID | Notes |
+| --- | --- | --- |
+| Anthropic | `anthropic` | Claude models |
+| OpenAI | `openai` | GPT and o-series models |
+| Google AI | `google` | Gemini models |
+| AWS Bedrock | `amazon-bedrock` | Requires AWS credentials |
+| Azure OpenAI | `azure` | Requires Azure deployment |
+| xAI | `xai` | Grok models |
+| Groq | `groq` | Fast inference |
+| Mistral | `mistral` | Mistral and Codestral |
+| Cohere | `cohere` | Command models |
+| DeepInfra | `deepinfra` | Multi-model hosting |
+| Cerebras | `cerebras` | Fast inference |
+| OpenRouter | `openrouter` | Multi-provider routing |
+| Perplexity | `perplexity` | Search-augmented models |
+| TogetherAI | `togetherai` | Open-source model hosting |
+| Vercel | `vercel` | Vercel AI Gateway |
+| GitLab | `gitlab` | GitLab Duo |
+| GitHub Copilot | `copilot` | GitHub Copilot models |
+| Antigravity | `antigravity` | Antigravity managed models |
+| Google Vertex | `google-vertex` | Google Cloud Vertex AI |
+
+## Provider config
+
+Configure providers in `config.yaml` under the `provider` key:
+
+```yaml
+provider:
+  openai:
+    options:
+      apiKey: '{env:OPENAI_API_KEY}'
+      baseURL: https://api.openai.com/v1
+      timeout: 300000
+    models:
+      gpt-4.1:
+        variants:
+          low: {}
+          medium: {}
+          high: {}
+```
+
+### Provider options
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `apiKey` | `string` | -- | API key (supports `{env:VAR}` interpolation) |
+| `baseURL` | `string` | -- | Base URL override for API requests |
+| `enterpriseUrl` | `string` | -- | GitHub Enterprise URL (Copilot provider only) |
+| `setCacheKey` | `boolean` | -- | Enable prompt cache key |
+| `timeout` | `number \| false` | `300000` | Request timeout in ms, or `false` to disable |
+
+### Model configuration
+
+- `models`: per-model configuration including `variants` (reasoning effort levels, can be disabled with `disabled: true`)
+
+## Provider config files
+
+Provider-specific config can be stored in separate files:
+
+- **Global**: `~/.config/0x0/providers/<provider-id>.yaml`
+- **Project**: `.0x0/providers/<provider-id>.yaml`
+
+The filename (without `.yaml`) becomes the provider ID. These files use the same schema as the
+`provider.<id>` config section and are merged at the appropriate precedence level.
+
+## Setting the default model
+
+```yaml
+model: anthropic/claude-sonnet-4
+```
+
+The format is `provider-id/model-id`. This can be overridden per-agent or via the `--model` CLI
+flag.
+
+A separate `small_model` field sets the model used for lightweight tasks like title generation:
+
+```yaml
+small_model: openai/gpt-4.1-mini
+```
+
+## Authentication
+
+Manage provider credentials:
+
+```bash
+# Interactive login (provider selection, OAuth or API key)
+0x0 auth login
+
+# Log in to a specific provider URL
+0x0 auth login https://api.openai.com
+
+# List configured providers and env var status
+0x0 auth list
+
+# Log out
+0x0 auth logout
+```
+
+Credentials are stored in `~/.config/0x0/auth.json`.
+
+## Listing models
+
+```bash
+# List all available models
+0x0 models
+
+# Filter by provider
+0x0 models anthropic
+
+# Verbose output with costs and metadata
+0x0 models --verbose
+
+# Refresh the model cache
+0x0 models --refresh
+```
+
+Model definitions are fetched from [models.dev](https://models.dev) and cached locally. Use
+`models_url` or `models_path` in config to override the source.
+
+## See also
+
+- [CLI Reference](/packages/0x0/cli-reference)
+- [Environment Variables](/packages/0x0/environment-variables)
+- [Complete CLI Guide](/packages/0x0/complete-guide)

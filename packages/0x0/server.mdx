@@ -1,0 +1,41 @@
+---
+title: 'Server'
+description: 'Run and integrate with the 0x0 headless HTTP server'
+icon: 'server'
+---
+
+Use server mode when you want browser clients or remote tooling to connect over HTTP.
+
+## Commands
+
+- `0x0 server` (alias `serve`): start headless server and keep process running
+- `0x0 attach <url>`: connect local TUI to a remote running server
+
+## Security
+
+- Set `ZEROXZERO_SERVER_PASSWORD` to require basic auth.
+- `server` warns if password is not set.
+- `attach` supports `--password` and falls back to `ZEROXZERO_SERVER_PASSWORD`.
+
+## `0x0 attach` options
+
+- `--dir <path>`: request server to use a specific directory context
+- `--session`, `-s`: continue a given session id
+- `--password`, `-p`: basic auth password
+
+## Examples
+
+```bash
+# Host local server
+0x0 server --hostname 127.0.0.1 --port 4096
+
+# Host for LAN access with mDNS
+0x0 server --hostname 0.0.0.0 --port 4096 --mdns
+
+# Attach local TUI to remote server
+0x0 attach https://my-host:4096 --password "$ZEROXZERO_SERVER_PASSWORD"
+```
+
+For options and workflows, see:
+
+- [Complete CLI Guide](/packages/0x0/complete-guide)

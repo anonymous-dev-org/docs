@@ -1,0 +1,139 @@
+---
+title: 'Tools'
+description: 'Built-in tools available to 0x0 agents'
+icon: 'wrench'
+---
+
+Tools are the actions that agents can invoke during a session. Each tool has a defined schema,
+permission requirements, and output format.
+
+## Built-in tools
+
+### File operations
+
+| Tool | Description |
+| --- | --- |
+| `read` | Read file contents with optional offset and line limit |
+| `write` | Write content to a file (creates or overwrites) |
+| `edit` | Make targeted string replacements in a file |
+| `multiedit` | Apply edits across multiple files in a single call |
+| `apply_patch` | Apply a unified diff patch to one or more files |
+| `glob` | Match files by glob pattern |
+| `grep` | Search file contents using regular expressions |
+| `ls` | List directory contents |
+
+### Search
+
+| Tool | Description |
+| --- | --- |
+| `search` | Search files by content (grep mode) or by name (glob mode) |
+| `search_remote` | Web search, URL fetch, or code search (unified remote search) |
+| `websearch` | Web search (legacy, maps to `search_remote` mode `web`) |
+| `webfetch` | Fetch URL content (legacy, maps to `search_remote` mode `fetch`) |
+| `codesearch` | Code search (legacy, maps to `search_remote` mode `code`) |
+
+### Execution
+
+| Tool | Description |
+| --- | --- |
+| `bash` | Execute shell commands with configurable timeout |
+
+### Agent and workflow
+
+| Tool | Description |
+| --- | --- |
+| `task` | Delegate work to a sub-agent (handoff or background) |
+| `todowrite` | Create and update structured TODO lists |
+| `question` | Ask the user interactive questions with options |
+
+### Protocol and integration
+
+| Tool | Description |
+| --- | --- |
+| `lsp` | Language Server Protocol operations (diagnostics, symbols, hover) |
+| `skill` | Invoke a discovered skill |
+| `batch` | Batch multiple operations (experimental) |
+| `external-directory` | Access directories outside the project root |
+
+## Permission mapping
+
+Multiple tools can map to the same permission. Configuring a permission affects all mapped tools.
+
+| Permission | Tools |
+| --- | --- |
+| `read` | `read` |
+| `edit` | `edit`, `write`, `apply_patch`, `multiedit` |
+| `search` | `search`, `glob`, `grep`, `ls` |
+| `search_remote` | `search_remote`, `websearch`, `webfetch`, `codesearch` |
+| `bash` | `bash` |
+| `task` | `task` |
+| `external_directory` | `external-directory` |
+| `todowrite` | `todowrite` |
+| `question` | `question` |
+| `lsp` | `lsp` |
+| `skill` | `skill` |
+
+See [Permissions](/packages/0x0/permissions) for how to configure access rules.
+
+## Legacy tool name migrations
+
+Older tool names are automatically migrated:
+
+| Legacy name | Current equivalent |
+| --- | --- |
+| `patch` | `apply_patch` |
+| `glob` | `search` (mode: files) |
+| `list` | `search` (mode: files) |
+| `grep` | `search` (mode: content) |
+| `webfetch` | `search_remote` (mode: fetch) |
+| `websearch` | `search_remote` (mode: web) |
+| `codesearch` | `search_remote` (mode: code) |
+
+## Custom tools
+
+Custom tools can be added in two ways:
+
+### Plugin tools
+
+Register tools via the `tool` hook in a [plugin](/packages/0x0/plugins):
+
+```typescript
+tool: () => ({
+  'my-tool': {
+    description: 'Does something useful',
+    args: { query: z.string() },
+    async execute(args, context) {
+      return `Result: ${args.query}`
+    },
+  },
+})
+```
+
+### Local tool files
+
+Place `.ts` or `.js` files in your project or global tool directory:
+
+- **Project**: `.zeroxzero/tool/*.{ts,js}` or `.zeroxzero/tools/*.{ts,js}`
+- **Global**: `~/.zeroxzero/tool/*.{ts,js}` or `~/.zeroxzero/tools/*.{ts,js}`
+
+## Controlling tool access
+
+Use `tools_allowed` in agent config to restrict which tools an agent can use:
+
+```yaml
+agent:
+  reviewer:
+    tools_allowed:
+      - read
+      - search
+      - question
+```
+
+Only tools listed in `tools_allowed` are available. Omitting `tools_allowed` on native agents
+allows all tools by default.
+
+## See also
+
+- [Agents](/packages/0x0/agents)
+- [Permissions](/packages/0x0/permissions)
+- [Plugins](/packages/0x0/plugins)

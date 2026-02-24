@@ -14,9 +14,7 @@
         "groups": [
           {
             "group": "Welcome",
-            "pages": [
-              "index"
-            ]
+            "pages": ["index"]
           }
         ]
       },
@@ -25,9 +23,7 @@
         "groups": [
           {
             "group": "Getting Started",
-            "pages": [
-              "packages/firetype/index"
-            ]
+            "pages": ["packages/firetype/index"]
           },
           {
             "group": "Guides",
@@ -39,44 +35,53 @@
           },
           {
             "group": "API Reference",
-            "pages": [
-              "packages/firetype/api-reference"
-            ]
+            "pages": ["packages/firetype/api-reference"]
           },
           {
             "group": "Help",
-            "pages": [
-              "packages/firetype/troubleshooting"
-            ]
+            "pages": ["packages/firetype/troubleshooting"]
           }
         ]
       },
       {
-        "tab": "0x0 CLI",
+        "tab": "0x0",
         "groups": [
           {
             "group": "Getting Started",
-            "pages": [
-              "packages/0x0-cli/index",
-              "packages/0x0-cli/tui-workflow"
-            ]
+            "pages": ["packages/0x0/index", "packages/0x0/tui-workflow"]
           },
           {
             "group": "Guides",
             "pages": [
-              "packages/0x0-cli/commands",
-              "packages/0x0-cli/keybinds",
-              "packages/0x0-cli/mcp-servers",
-              "packages/0x0-cli/network"
+              "packages/0x0/agents",
+              "packages/0x0/permissions",
+              "packages/0x0/tools",
+              "packages/0x0/commands",
+              "packages/0x0/config-strategy",
+              "packages/0x0/keybinds",
+              "packages/0x0/mcp-servers",
+              "packages/0x0/network",
+              "packages/0x0/plugins",
+              "packages/0x0/skills",
+              "packages/0x0/providers"
+            ]
+          },
+          {
+            "group": "Clients",
+            "pages": [
+              "packages/0x0/neovim",
+              "packages/0x0/neovim-completion",
+              "packages/0x0/git"
             ]
           },
           {
             "group": "Reference",
             "pages": [
-              "packages/0x0-cli/cli-reference",
-              "packages/0x0-cli/environment-variables",
-              "packages/0x0-cli/server",
-              "packages/0x0-cli/complete-guide"
+              "packages/0x0/cli-reference",
+              "packages/0x0/environment-variables",
+              "packages/0x0/server",
+              "packages/0x0/acp",
+              "packages/0x0/complete-guide"
             ]
           }
         ]
@@ -93,16 +98,7 @@
     }
   },
   "contextual": {
-    "options": [
-      "copy",
-      "view",
-      "chatgpt",
-      "claude",
-      "perplexity",
-      "mcp",
-      "cursor",
-      "vscode"
-    ]
+    "options": ["copy", "view", "chatgpt", "claude", "perplexity", "mcp", "cursor", "vscode"]
   },
   "footer": {
     "socials": {

@@ -1,0 +1,100 @@
+---
+title: 'Commands'
+description: 'Create reusable slash commands for the 0x0 TUI'
+icon: 'terminal'
+---
+
+Slash commands let you define reusable prompt workflows that can be invoked from the TUI or
+non-interactive mode.
+
+## Built-in commands
+
+0x0 ships with two built-in commands:
+
+| Command | Description |
+| --- | --- |
+| `init` | Initialize a project with recommended config and structure |
+| `review` | Run a code review on the current changes |
+
+## Where commands are loaded from
+
+0x0 loads commands from multiple sources (in priority order):
+
+1. **Built-in commands** -- `init` and `review`
+2. **Config-defined commands** -- the `command` key in `config.yaml`
+3. **Command markdown files** -- `.zeroxzero/command/**/*.md` and `.zeroxzero/commands/**/*.md`
+4. **Global command directories** -- `~/.zeroxzero/command/**/*.md` and `~/.zeroxzero/commands/**/*.md`
+5. **MCP prompts** -- prompts exposed by configured MCP servers
+6. **Skills** -- discovered skills are available as commands
+
+## Running a command
+
+- In TUI: type `/your-command` in the input field
+- In non-interactive mode: `0x0 run --command your-command [message..]`
+- From the command palette: press `ctrl+p` and select the command
+
+## Command markdown file
+
+Command files use YAML frontmatter with a markdown body:
+
+```md
+---
+description: Summarize current changes and risks
+---
+
+Analyze this repository state and provide:
+
+1. concise change summary
+2. notable risks
+3. suggested follow-up checks
+```
+
+The filename (without `.md`) becomes the command name.
+
+## Config-defined commands
+
+Define commands in `config.yaml` under the `command` key:
+
+```yaml
+command:
+  summarize:
+    description: Summarize current changes and risks
+    template: |
+      Analyze this repository state and provide:
+      1. concise change summary
+      2. notable risks
+      3. suggested follow-up checks
+  test:
+    description: Run tests and fix failures
+    agent: builder
+    model: anthropic/claude-sonnet-4
+    template: Run the test suite. Fix any failures.
+  plan:
+    description: Create an implementation plan
+    subtask: true
+    template: Create a plan for the following task.
+```
+
+### Command config fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `template` | `string` | The prompt template text |
+| `description` | `string` | Description shown in the command palette |
+| `agent` | `string` | Agent to use when running this command |
+| `model` | `string` | Model to use (in `provider/model` format) |
+| `subtask` | `boolean` | Run the command as a background subtask |
+
+## Tips
+
+- Keep command names stable so teammates can share workflows.
+- Put project-specific commands in repo `.zeroxzero/commands`.
+- Keep global commands focused on reusable personal workflows.
+- Use `subtask: true` for commands that should run in the background without blocking.
+
+## See also
+
+- [Agents](/packages/0x0/agents)
+- [Skills](/packages/0x0/skills)
+- [MCP Servers](/packages/0x0/mcp-servers)
+- [Complete CLI Guide](/packages/0x0/complete-guide)

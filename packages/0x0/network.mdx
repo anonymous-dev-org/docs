@@ -1,0 +1,42 @@
+---
+title: 'Network'
+description: 'Hostname, port, mDNS, and CORS options for 0x0 services'
+icon: 'globe'
+---
+
+The CLI exposes shared network flags for commands that can host a server.
+
+## Commands that accept network flags
+
+- `0x0 [project]`
+- `0x0 server` (alias `serve`)
+- `0x0 acp`
+
+## Shared flags
+
+- `--port` (default `0`)
+- `--hostname` (default `127.0.0.1`)
+- `--mdns` (default `false`)
+- `--mdns-domain` (default `zeroxzero.local`)
+- `--cors <origin>` (repeatable)
+
+## Behavior details
+
+- If `--mdns` is enabled and hostname is not explicitly set in config/CLI, host binding defaults to
+  `0.0.0.0`.
+- For TUI startup, server mode is started only when network settings require external access.
+
+## Examples
+
+```bash
+# Start headless server on fixed port with mDNS
+0x0 server --port 4096 --mdns --mdns-domain zeroxzero.local
+
+# Start headless server allowing a specific browser origin
+0x0 server --hostname 0.0.0.0 --port 4096 --cors https://app.example.com
+```
+
+See also:
+
+- [Complete CLI Guide](/packages/0x0/complete-guide)
+- [Server](/packages/0x0/server)

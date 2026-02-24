@@ -1,0 +1,113 @@
+---
+title: 'Skills'
+description: 'Portable instruction packs for 0x0 agents'
+icon: 'sparkles'
+---
+
+Skills are reusable instruction packs that inject domain-specific knowledge and behavior into agent
+sessions.
+
+## SKILL.md format
+
+Each skill is a markdown file named `SKILL.md` with YAML frontmatter:
+
+```md
+---
+name: react-best-practices
+description: React component patterns and performance guidelines
+---
+
+When writing React components, follow these guidelines:
+
+1. Prefer functional components with hooks over class components.
+2. Use `useMemo` and `useCallback` for expensive computations and stable references.
+3. Keep components small and focused on a single responsibility.
+```
+
+### Frontmatter fields
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `name` | `string` | Yes | Unique skill name |
+| `description` | `string` | Yes | Description of what the skill provides |
+
+The markdown body becomes the skill's instructions, injected into the agent's context when the skill
+is active.
+
+## Discovery
+
+Skills are discovered from multiple sources:
+
+### Local directories
+
+0x0 scans for `SKILL.md` files in `.zeroxzero/` directories:
+
+- **Project**: `.zeroxzero/skill/**/SKILL.md` or `.zeroxzero/skills/**/SKILL.md`
+- **Global**: `~/.zeroxzero/skill/**/SKILL.md` or `~/.zeroxzero/skills/**/SKILL.md`
+
+Directories are walked upward from the current project directory to the worktree root.
+
+### Additional paths
+
+Add extra skill directories via config:
+
+```yaml
+skills:
+  paths:
+    - ./vendor/skills
+    - ~/my-skills
+```
+
+Relative paths are resolved from the project directory. Paths that do not exist are skipped with a
+warning.
+
+### Remote URLs
+
+Fetch skills from remote servers:
+
+```yaml
+skills:
+  urls:
+    - https://example.com/.well-known/skills/
+```
+
+Remote skill discovery uses an `index.json` protocol:
+
+```json
+{
+  "skills": [
+    {
+      "name": "react-best-practices",
+      "description": "React component patterns and performance guidelines",
+      "files": ["SKILL.md", "examples.md"]
+    }
+  ]
+}
+```
+
+Files are fetched from `{base_url}/{skill_name}/{file}` and cached locally in
+`~/.cache/zeroxzero/skills/`. Only skills containing a `SKILL.md` file are loaded.
+
+## Duplicate handling
+
+If two skills share the same `name`, the later-discovered skill overwrites the earlier one. A
+warning is logged when this happens.
+
+## Permission integration
+
+Skill directories are automatically added to the permission system as allowed paths for the
+`external_directory` permission. This means agents can read skill files without additional
+permission configuration.
+
+## Debugging
+
+List all discovered skills:
+
+```bash
+0x0 debug skill
+```
+
+## See also
+
+- [Agents](/packages/0x0/agents)
+- [Complete CLI Guide](/packages/0x0/complete-guide)

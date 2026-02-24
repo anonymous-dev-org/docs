@@ -1,0 +1,128 @@
+---
+title: 'Git Commit Client'
+description: 'AI-powered commit message generation using Claude or Codex'
+icon: 'git-commit-horizontal'
+---
+
+`0x0-git` is a standalone CLI that generates AI-powered commit messages from your staged changes. It
+auto-detects whether you have the Claude or Codex CLI installed, picks the right model, and
+communicates with the 0x0 server's `/completion/text` endpoint. It can be installed as a git hook for
+automatic suggestions on every commit.
+
+## Installation
+
+```bash
+npm i -g @0x0-ai/git
+```
+
+## Requirements
+
+- **0x0 CLI** (`0x0`) -- needed for auto-starting the server (see below)
+- At least one of these LLM CLI tools:
+  - **Claude Code CLI** (`claude`) -- uses `claude-haiku-4-5-20251001` by default
+  - **OpenAI Codex CLI** (`codex`) -- uses `o4-mini` by default
+
+The tool auto-detects which LLM provider is available, preferring Claude.
+
+## Usage
+
+### Generate a commit message
+
+```bash
+# Stage your changes first
+git add .
+
+# Generate a message (auto-detects provider)
+0x0-git commit-msg
+
+# Specify provider and model explicitly
+0x0-git commit-msg --provider claude --model claude-sonnet-4-20250514
+0x0-git commit-msg --provider codex --model o4-mini
+```
+
+### Install as a git hook
+
+```bash
+# Install into prepare-commit-msg hook
+0x0-git hook install
+
+# Remove the hook
+0x0-git hook uninstall
+```
+
+Once installed, every `git commit` (without `-m`) automatically generates a message from your staged
+diff. The hook is non-destructive: it preserves existing hook content, uses markers for safe
+uninstall, and skips generation when a message is already provided (`-m`, merge, squash, amend).
+
+The hook also respects custom hook paths via `core.hooksPath` (husky compatible).
+
+## Configuration
+
+Configuration is resolved in priority order:
+
+| Source | Provider | Model | URL | Auth |
+| --- | --- | --- | --- | --- |
+| CLI flags | `--provider` | `--model` | -- | -- |
+| Environment | `GIT_AI_PROVIDER` | `GIT_AI_MODEL` | `GIT_AI_URL` | `GIT_AI_AUTH` |
+| Auto-detect | Prefers `claude`, falls back to `codex` | Per-provider default | `http://localhost:4096` | none |
+
+### Environment variables
+
+| Variable | Description |
+| --- | --- |
+| `GIT_AI_PROVIDER` | Provider to use: `claude` or `codex` |
+| `GIT_AI_MODEL` | Model to use (overrides provider default) |
+| `GIT_AI_URL` | 0x0 server URL (default: `http://localhost:4096`) |
+| `GIT_AI_AUTH` | Basic auth credentials in `username:password` format |
+
+### Default models
+
+| Provider | Default model |
+| --- | --- |
+| `claude` | `claude-haiku-4-5-20251001` |
+| `codex` | `o4-mini` |
+
+## Commit message format
+
+Generated messages follow the [Conventional Commits](https://www.conventionalcommits.org/) format:
+
+```
+<type>(<scope>): <description>
+
+[optional body]
+```
+
+- **Types**: `feat`, `fix`, `refactor`, `docs`, `style`, `test`, `chore`, `perf`, `ci`, `build`
+- **Scope**: most relevant module or area (optional)
+- **Subject line**: under 72 characters, imperative mood
+- **Body**: added only when the changes warrant explanation
+
+Diffs larger than 20,000 characters are truncated. The full file list is always included.
+
+## How it works
+
+1. Auto-detects the available provider (`claude` or `codex` binary)
+2. Reads staged changes via `git diff --cached`
+3. Builds a prompt with the file list and diff
+4. Ensures the 0x0 server is running (auto-starts it if needed)
+5. Sends the prompt to the 0x0 server's `/completion/text` SSE endpoint
+6. Streams the response and outputs the commit message
+
+The server handles provider routing, API keys, and model selection -- `0x0-git` itself has zero
+direct LLM dependencies.
+
+### Auto-start server
+
+If the 0x0 server is not already running, `0x0-git` will automatically start it. It looks for the
+`0x0` binary in your PATH and spawns `0x0 server --port <port>` as a detached background process,
+then waits up to 15 seconds for it to become available. If `0x0` is not found in PATH, an error is
+thrown.
+
+This means you don't need to manually start the server before running `0x0-git` -- it handles
+everything for you.
+
+## See also
+
+- [Server](/packages/0x0/server) -- headless HTTP server mode
+- [Providers](/packages/0x0/providers) -- configure LLM providers and models
+- [CLI Reference](/packages/0x0/cli-reference) -- `0x0 server` command reference

@@ -1,0 +1,162 @@
+---
+title: 'Agents'
+description: 'Built-in and custom AI agents for 0x0'
+icon: 'bot'
+---
+
+Agents define behavior profiles for the AI assistant. Each agent has its own system prompt, tool
+access, permissions, and model settings.
+
+## Built-in agents
+
+0x0 ships with two visible agents and several hidden internal agents.
+
+### Builder (default)
+
+The default agent with full tool access for writing and shipping code.
+
+| Setting | Value |
+| --- | --- |
+| Color | `#6EE7B7` |
+| Thinking effort | `medium` |
+| Tools | `bash`, `read`, `search`, `search_remote`, `apply_patch`, `task`, `todowrite`, `question` |
+
+### Planner
+
+A read-only agent for research and planning. Edit tools are disabled.
+
+| Setting | Value |
+| --- | --- |
+| Color | `#A5B4FC` |
+| Thinking effort | `high` |
+| Tools | `question`, `read`, `search`, `search_remote`, `task` |
+
+The planner has special permission overrides:
+
+- `read` access to all files (`.env` files prompt the user)
+- `edit` access to `.zeroxzero/plans/*` only
+- `external_directory` access to the global plans directory
+
+### Hidden agents
+
+These agents are used internally and do not appear in the agent picker:
+
+- **Compaction** -- summarizes conversation history during context compaction
+- **Title** -- generates session titles (temperature 0.5)
+- **Summary** -- generates session summaries
+- **Explore** -- used by the `task` tool for codebase exploration subtasks
+- **General** -- used by the `task` tool for general-purpose subtasks
+
+## Default agent selection
+
+1. If `default_agent` is set in config, that agent is used (must not be hidden).
+2. Otherwise, the `planner` agent is preferred if available.
+3. Otherwise, the first visible agent is used.
+
+## Custom agents
+
+Create custom agents as markdown files with YAML frontmatter.
+
+### File locations
+
+- **Project**: `.zeroxzero/agent/*.md` or `.zeroxzero/agents/*.md`
+- **Global**: `~/.zeroxzero/agent/*.md` or `~/.zeroxzero/agents/*.md`
+
+The filename (without `.md`) becomes the agent's identifier.
+
+### Frontmatter fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `name` | `string` | Display name shown in the UI |
+| `description` | `string` | Description (shown in agent picker and `@` autocomplete) |
+| `color` | `string` | Hex color code (e.g., `#2563EB`) |
+| `model` | `string` | Model in `provider/model` format |
+| `variant` | `string` | Default model variant / reasoning effort |
+| `temperature` | `number` | Temperature sampling parameter |
+| `top_p` | `number` | Top-p sampling parameter |
+| `thinking_effort` | `string` | Model-native reasoning effort value |
+| `tools_allowed` | `string[]` | Allowlist of tool IDs the agent may use |
+| `steps` | `number` | Max agentic iterations before forcing text-only |
+| `maxSteps` | `number` | Alias for `steps` |
+| `mode` | `"primary" \| "all"` | `primary` = only as primary agent; `all` = available everywhere |
+| `hidden` | `boolean` | Hide from the agent picker |
+| `disable` | `boolean` | Disable this agent entirely |
+| `knowledge_base` | `string[]` | Agent-specific knowledge snippets |
+| `permission` | `object` | Per-agent permission overrides (see [Permissions](/packages/0x0/permissions)) |
+| `options` | `object` | Arbitrary extra options |
+
+The markdown body becomes the agent's system prompt.
+
+### Example
+
+`.zeroxzero/agents/reviewer.md`:
+
+```md
+---
+name: Reviewer
+description: Code review agent with read-only access
+color: '#059669'
+thinking_effort: high
+tools_allowed:
+  - read
+  - search
+  - search_remote
+  - task
+  - question
+permission:
+  edit: deny
+  bash: deny
+---
+
+You are a code reviewer. Analyze code for bugs, performance issues, and style problems.
+Never modify files directly. Provide detailed feedback with file paths and line numbers.
+```
+
+## Config-based agents
+
+Agents can also be defined in `config.yaml` under the `agent` key:
+
+```yaml
+agent:
+  reviewer:
+    name: Reviewer
+    description: Code review agent with read-only access
+    color: '#059669'
+    thinking_effort: high
+    tools_allowed:
+      - read
+      - search
+      - search_remote
+      - task
+      - question
+    permission:
+      edit: deny
+      bash: deny
+    prompt: |
+      You are a code reviewer. Analyze code for bugs, performance issues,
+      and style problems.
+```
+
+## Agent permissions
+
+Native agents (builder, planner) start with permissive defaults and apply user overrides on top.
+
+Custom agents start with all permissions denied. Only tools listed in `tools_allowed` are explicitly
+allowed. Additional permission rules from the `permission` field are layered on top.
+
+See [Permissions](/packages/0x0/permissions) for the full permission system.
+
+## CLI commands
+
+- `0x0 agent create`: create a new agent interactively or with flags
+- `0x0 agent list`: list all available agents
+- `0x0 debug agent <name>`: show resolved agent configuration
+
+See [CLI Reference](/packages/0x0/cli-reference) for all flags.
+
+## See also
+
+- [Permissions](/packages/0x0/permissions)
+- [Tools](/packages/0x0/tools)
+- [CLI Reference](/packages/0x0/cli-reference)

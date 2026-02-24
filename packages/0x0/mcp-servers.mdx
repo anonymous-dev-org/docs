@@ -1,0 +1,46 @@
+---
+title: 'MCP Servers'
+description: 'Configure local/remote MCP servers and OAuth auth flow'
+icon: 'plug'
+---
+
+0x0 supports local command-based MCP servers and remote MCP HTTP endpoints.
+
+## MCP commands
+
+- `0x0 mcp add`: interactive setup and config write
+- `0x0 mcp list`: list configured servers and status
+- `0x0 mcp auth [name]`: start OAuth auth flow for remote servers
+- `0x0 mcp auth list`: list OAuth-capable servers and auth status
+- `0x0 mcp logout [name]`: remove stored OAuth credentials
+- `0x0 mcp debug <name>`: inspect and test remote OAuth setup
+
+## Config examples
+
+```yaml
+mcp:
+  local-files:
+    type: local
+    command: ['npx', '-y', '@modelcontextprotocol/server-filesystem', '.']
+
+  remote-docs:
+    type: remote
+    url: https://example.com/mcp
+
+  remote-oauth:
+    type: remote
+    url: https://example.com/mcp
+    oauth:
+      clientId: '{env:MCP_CLIENT_ID}'
+      clientSecret: '{env:MCP_CLIENT_SECRET}'
+```
+
+## OAuth notes
+
+- Remote servers are treated as OAuth-capable by default unless `oauth: false` is set.
+- If client credentials are omitted, dynamic client registration may be attempted.
+- Auth state is persisted locally and shown in `mcp list`/`mcp auth list`.
+
+See setup patterns and config examples in:
+
+- [Complete CLI Guide](/packages/0x0/complete-guide)
