@@ -103,8 +103,8 @@ permission:
     '*.env.example': allow
 ```
 
-Custom (non-native) agents start with all permissions denied. Only tools listed in `tools_allowed`
-are explicitly allowed, and the agent's `permission` field is layered on top.
+Custom (non-native) agents start with all permissions denied. Only tools listed in `actions` (or
+the legacy `tools_allowed`) are explicitly allowed, and the agent's `permission` field is layered on top.
 
 ## Agent-level overrides
 
@@ -149,14 +149,6 @@ under `agent.<agentName>.actions.<providerID>.<toolName>`. This uses the provide
 | `DeniedError` | Rule evaluates to `deny` | Tool call rejected, includes the relevant ruleset |
 | `RejectedError` | User rejects without feedback | Halts the current tool execution |
 | `CorrectedError` | User rejects with a feedback message | Continues with user guidance |
-
-## Inline override
-
-Use `ZEROXZERO_PERMISSION` to inject permission rules via environment variable:
-
-```bash
-ZEROXZERO_PERMISSION='{"bash":"allow","edit":"allow"}' 0x0 run "fix the bug"
-```
 
 ## See also
 

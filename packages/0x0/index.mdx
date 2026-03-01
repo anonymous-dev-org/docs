@@ -5,16 +5,18 @@ description: 'An open-source AI coding agent with a server-client architecture -
 
 Welcome to the 0x0 docs.
 
-0x0 is an open-source AI coding agent built around a **server-client architecture**. The core is an
-HTTP server that handles LLM providers, tool execution, sessions, and permissions. Clients connect to
-it over HTTP and SSE -- the TUI, VSCode/Cursor extension, Neovim plugin, and standalone tools like
-the git commit client are all clients of the same server.
+0x0 is an open-source AI coding agent built around a **server-client architecture**, inspired by
+[opencode](https://github.com/anomalyco/opencode). The core is an HTTP server that handles LLM
+providers, tool execution, sessions, and permissions. Clients connect to it over HTTP and SSE -- the
+TUI, VSCode/Cursor extension, Neovim plugin, and standalone tools like the git commit client are all
+clients of the same server.
 
 This architecture means you can build your own clients on top of the server, and all clients share
 the same configuration, agents, and provider credentials.
 
-0x0 is fully compatible with and respects the terms of use of Anthropic and OpenAI, so you can use
-it without risk of getting your accounts banned.
+Unlike opencode, 0x0 is fully compliant with and respects the terms of use of all supported
+providers -- including Anthropic (Claude Code), OpenAI (Codex), and others. You can use it without
+risk of getting your accounts banned.
 
 ## Get started
 

@@ -7,56 +7,61 @@ icon: 'wrench'
 Tools are the actions that agents can invoke during a session. Each tool has a defined schema,
 permission requirements, and output format.
 
-## Registered tools
+## Tool registry
 
-These tools are registered in the tool registry and available to agents by default:
+0x0 maintains an internal tool registry. Provider SDKs (Claude Code, Codex) use their own tool
+names which are mapped to registry IDs for permission checks.
 
-| Tool | Description |
-| --- | --- |
-| `bash` | Execute shell commands with configurable timeout |
-| `read` | Read file contents with optional offset and line limit |
-| `search` | Search files by content (grep mode) or by name (glob mode) |
-| `search_remote` | Web search, URL fetch, or code search (unified remote search) |
-| `apply_patch` | Apply a unified diff patch to one or more files |
-| `task` | Delegate work to a sub-agent (handoff or background) |
-| `todowrite` | Create and update structured TODO lists |
-| `question` | Ask the user interactive questions with options |
-| `lsp` | Language Server Protocol operations (experimental, requires `experimental.lsp_tool: true`) |
+### Built-in tools
 
-## Provider-delegated tools
-
-When 0x0 delegates to a CLI provider (Claude Code or Codex), the provider brings its own tool set.
-These tools execute inside the provider's runtime, not 0x0's tool registry. 0x0 maps them to
-permissions for access control:
-
-| Tool | Permission | Description |
+| Registry ID | SDK action names | Description |
 | --- | --- | --- |
-| `Edit` | `edit` | Make targeted string replacements in a file |
-| `Write` | `edit` | Write content to a file (creates or overwrites) |
-| `MultiEdit` | `edit` | Apply edits across multiple files in a single call |
-| `NotebookEdit` | `edit` | Edit Jupyter notebook cells |
-| `Glob` | `search` | Match files by glob pattern |
-| `Grep` | `search` | Search file contents using regular expressions |
-| `Bash` | `bash` | Execute shell commands |
-| `Read` | `read` | Read file contents |
-| `WebFetch` | `web` | Fetch URL content |
-| `WebSearch` | `web` | Web search |
-| `Task` | `task` | Delegate subtasks |
+| `bash` | `Bash` | Execute shell commands with configurable timeout |
+| `read` | `Read` | Read file contents with optional offset and line limit |
+| `write` | `Write` | Write content to a file (creates or overwrites) |
+| `edit` | `Edit`, `MultiEdit`, `NotebookEdit` | Make targeted string replacements in files |
+| `search` | `Glob`, `Grep` | Search files by name (glob mode) or content (grep mode) |
+| `search_remote` | `WebFetch`, `WebSearch` | Web search, URL fetch, or code search |
+| `apply_patch` | `ApplyPatch` | Apply a unified diff patch to one or more files |
+| `task` | `Task` | Delegate work to a sub-agent (handoff or background) |
+| `todo_write` | `TodoWrite` | Create and update structured TODO lists |
+| `question` | `AskUserQuestion` | Ask the user interactive questions with options (only available for `app`, `cli`, and `desktop` clients) |
+| `lsp` | `Lsp` | Language Server Protocol operations (experimental, requires `experimental.lsp_tool: true`) |
+| `docs` | `Docs` | Context7 documentation search (experimental, requires `experimental.context7_api_key`) |
+
+### Agent actions
+
+Agent `actions` config uses the **SDK action names** (PascalCase), not registry IDs. For example:
+
+```yaml
+agent:
+  reviewer:
+    actions:
+      Read: allow
+      Glob: allow
+      Grep: allow
+      WebFetch: allow
+      WebSearch: allow
+      Task: allow
+      AskUserQuestion: allow
+```
+
+The legacy `tools_allowed` field uses registry-style IDs (`bash`, `read`, `search`, etc.) and is
+automatically converted to the `actions` format internally.
 
 ## Permission mapping
 
 Multiple tools can map to the same permission. Configuring a permission affects all mapped tools.
 
-| Permission | Tools |
+| Permission | Registry tools |
 | --- | --- |
 | `read` | `read` |
-| `edit` | `edit`, `write`, `apply_patch`, `multiedit` |
-| `search` | `search`, `glob`, `grep`, `ls` |
-| `search_remote` | `search_remote` (0x0 registered tool) |
-| `web` | `WebFetch`, `WebSearch` (provider-delegated tools) |
+| `edit` | `edit`, `write`, `apply_patch` |
+| `search` | `search` |
+| `search_remote` | `search_remote` |
 | `bash` | `bash` |
 | `task` | `task` |
-| `todowrite` | `todowrite` |
+| `todowrite` | `todo_write` |
 | `question` | `question` |
 | `lsp` | `lsp` |
 | `skill` | `skill` |
@@ -66,17 +71,18 @@ See [Permissions](/packages/0x0/permissions) for how to configure access rules.
 
 ## Legacy tool name migrations
 
-Older tool names in config are automatically migrated:
+Older `tools_allowed` values are automatically converted to `actions`:
 
-| Legacy name | Current equivalent |
+| Legacy `tools_allowed` value | SDK actions |
 | --- | --- |
-| `patch` | `apply_patch` |
-| `glob` | `search` (mode: files) |
-| `list` | `search` (mode: files) |
-| `grep` | `search` (mode: content) |
-| `webfetch` | `search_remote` (mode: fetch) |
-| `websearch` | `search_remote` (mode: web) |
-| `codesearch` | `search_remote` (mode: code) |
+| `bash` | `Bash` |
+| `read` | `Read` |
+| `search` | `Glob`, `Grep` |
+| `search_remote` | `WebFetch`, `WebSearch` |
+| `apply_patch` | `Edit`, `Write`, `MultiEdit`, `NotebookEdit` |
+| `task` | `Task` |
+| `todowrite` | `TodoWrite` |
+| `question` | `AskUserQuestion` |
 
 ## Custom tools
 
@@ -107,19 +113,21 @@ Place `.ts` or `.js` files in your project or global tool directory:
 
 ## Controlling tool access
 
-Use `tools_allowed` in agent config to restrict which tools an agent can use:
+Use `actions` in agent config to control which tools an agent can use:
 
 ```yaml
 agent:
   reviewer:
-    tools_allowed:
-      - read
-      - search
-      - question
+    actions:
+      Read: allow
+      Glob: allow
+      Grep: allow
+      AskUserQuestion: allow
 ```
 
-Only tools listed in `tools_allowed` are available. Omitting `tools_allowed` on native agents
-allows all tools by default.
+Only tools with an `allow` or `ask` action are available. Omitting `actions` on native agents
+allows all tools by default. The legacy `tools_allowed` field is still supported but `actions`
+is preferred.
 
 ## See also
 

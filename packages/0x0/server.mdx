@@ -13,9 +13,9 @@ Use server mode when you want browser clients or remote tooling to connect over 
 
 ## Security
 
-- Set `ZEROXZERO_SERVER_PASSWORD` to require basic auth.
+- Set `server.password` in `config.yaml` to require basic auth.
 - `server` warns if password is not set.
-- `attach` supports `--password` and falls back to `ZEROXZERO_SERVER_PASSWORD`.
+- `attach` supports `--password` and falls back to `server.password` in config.
 
 ## `0x0 attach` options
 
@@ -33,7 +33,7 @@ Use server mode when you want browser clients or remote tooling to connect over 
 0x0 server --hostname 0.0.0.0 --port 4096 --mdns
 
 # Attach local TUI to remote server
-0x0 attach https://my-host:4096 --password "$ZEROXZERO_SERVER_PASSWORD"
+0x0 attach https://my-host:4096 --password "your-password"
 ```
 
 For options and workflows, see:

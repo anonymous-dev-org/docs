@@ -13,23 +13,23 @@ access, permissions, and model settings.
 
 ### Builder
 
-Full tool access agent for writing and shipping code.
+The default agent. Executes tools based on configured permissions.
 
 | Setting | Value |
 | --- | --- |
 | Color | `#6EE7B7` |
 | Thinking effort | `medium` |
-| Tools | `bash`, `read`, `search`, `search_remote`, `apply_patch`, `task`, `todowrite`, `question` |
+| Actions | `Bash`, `Read`, `Edit`, `Write`, `Glob`, `Grep`, `WebFetch`, `WebSearch`, `Task`, `TodoWrite`, `AskUserQuestion`, `ApplyPatch`, `Docs` |
 
 ### Planner
 
-A read-only agent for research and planning. Edit tools are disabled.
+Planning agent. Disallows all edit tools.
 
 | Setting | Value |
 | --- | --- |
 | Color | `#A5B4FC` |
 | Thinking effort | `high` |
-| Tools | `question`, `read`, `search`, `search_remote`, `task` |
+| Actions | `Read`, `Glob`, `Grep`, `WebFetch`, `WebSearch`, `Task`, `AskUserQuestion`, `TodoWrite`, `Docs` |
 
 The planner has special permission overrides:
 
@@ -78,7 +78,8 @@ The filename (without `.md`) becomes the agent's identifier.
 | `temperature` | `number` | Temperature sampling parameter |
 | `top_p` | `number` | Top-p sampling parameter |
 | `thinking_effort` | `string` | Model-native reasoning effort value |
-| `tools_allowed` | `string[]` | Allowlist of tool IDs the agent may use |
+| `tools_allowed` | `string[]` | Legacy allowlist of tool IDs (auto-converted to `actions`; prefer `actions` instead) |
+| `actions` | `object` | Tool action policies: map SDK action names to `allow`, `deny`, or `ask` |
 | `steps` | `number` | Max agentic iterations before forcing text-only |
 | `maxSteps` | `number` | Alias for `steps` |
 | `mode` | `"primary" \| "all"` | `primary` = only as primary agent; `all` = available everywhere |
@@ -86,7 +87,6 @@ The filename (without `.md`) becomes the agent's identifier.
 | `disable` | `boolean` | Disable this agent entirely |
 | `knowledge_base` | `string[]` | Agent-specific knowledge snippets |
 | `permission` | `object` | Per-agent permission overrides (see [Permissions](/packages/0x0/permissions)) |
-| `actions` | `object` | Per-provider tool action policies (auto-managed by "Always Allow"/"Always Deny" in TUI) |
 | `options` | `object` | Arbitrary extra options |
 
 The markdown body becomes the agent's system prompt.
@@ -101,12 +101,14 @@ name: Reviewer
 description: Code review agent with read-only access
 color: '#059669'
 thinking_effort: high
-tools_allowed:
-  - read
-  - search
-  - search_remote
-  - task
-  - question
+actions:
+  Read: allow
+  Glob: allow
+  Grep: allow
+  WebFetch: allow
+  WebSearch: allow
+  Task: allow
+  AskUserQuestion: allow
 permission:
   edit: deny
   bash: deny
@@ -127,12 +129,14 @@ agent:
     description: Code review agent with read-only access
     color: '#059669'
     thinking_effort: high
-    tools_allowed:
-      - read
-      - search
-      - search_remote
-      - task
-      - question
+    actions:
+      Read: allow
+      Glob: allow
+      Grep: allow
+      WebFetch: allow
+      WebSearch: allow
+      Task: allow
+      AskUserQuestion: allow
     permission:
       edit: deny
       bash: deny
@@ -145,7 +149,7 @@ agent:
 
 Native agents (builder, planner) start with permissive defaults and apply user overrides on top.
 
-Custom agents start with all permissions denied. Only tools listed in `tools_allowed` are explicitly
+Custom agents start with all permissions denied. Only tools listed in `actions` are explicitly
 allowed. Additional permission rules from the `permission` field are layered on top.
 
 See [Permissions](/packages/0x0/permissions) for the full permission system.

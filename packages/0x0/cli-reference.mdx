@@ -49,6 +49,18 @@ Options:
 - `--agent`: agent to use
 - network flags: `--port`, `--hostname`, `--mdns`, `--mdns-domain`, `--cors`
 
+## `0x0 completion`
+
+Outputs a shell completion script. Source the output in your shell profile:
+
+```bash
+# bash
+eval "$(0x0 completion)"
+
+# zsh
+eval "$(0x0 completion)"
+```
+
 ## `0x0 run [message..]`
 
 Options:
@@ -80,7 +92,7 @@ Options:
 
 - `--dir`: directory to run in
 - `--session`, `-s`: session id to continue
-- `--password`, `-p`: basic auth password (defaults to `ZEROXZERO_SERVER_PASSWORD`)
+- `--password`, `-p`: basic auth password (defaults to `server.password` in config.yaml)
 
 ## `0x0 acp`
 
@@ -113,7 +125,7 @@ Subcommands:
 
 - `--path`: directory path to generate the agent file
 - `--description`: what the agent should do
-- `--tools`: comma-separated list of tools to enable (default: all). Available: `bash`, `read`, `search`, `search_remote`, `apply_patch`, `task`, `todowrite`, `question`, `lsp`
+- `--tools`: comma-separated list of tools to enable (default: all). Available: `Bash`, `Read`, `Edit`, `Write`, `MultiEdit`, `Glob`, `Grep`, `WebFetch`, `WebSearch`, `Task`, `TodoWrite`, `AskUserQuestion`
 - `--model`, `-m`: model to use in the format of provider/model
 
 ## `0x0 models [provider]`
@@ -121,7 +133,6 @@ Subcommands:
 Options:
 
 - `--verbose`: use more verbose model output (includes metadata like costs)
-- `--refresh`: refresh the models cache
 
 ## `0x0 stats`
 

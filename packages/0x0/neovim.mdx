@@ -62,15 +62,10 @@ require("zeroxzero").setup({
   },
   keymaps = {
     toggle = "<leader>0",
-    ask = "<leader>0a",
-    add_file = "<leader>0f",
-    add_selection = "<leader>0s",
-    session_list = "<leader>0l",
-    session_new = "<leader>0n",
-    session_interrupt = "<leader>0i",
-    model_list = "<leader>0m",
-    command_picker = "<leader>0c",
-    agent_picker = "<leader>0g",
+    context = "<leader>0f",
+    session = "<leader>0s",
+    interrupt = "<leader>0i",
+    model = "<leader>0m",
     inline_edit = "<leader>0e",
   },
   auth = nil,                     -- Optional {username = "...", password = "..."}
@@ -86,15 +81,10 @@ All keymaps are configurable via the `keymaps` table. Set any key to `""` (empty
 | Keymap | Mode | Action |
 | --- | --- | --- |
 | `<leader>0` | n | Toggle chat window |
-| `<leader>0a` | n, v | Ask (with selection context in visual mode) |
-| `<leader>0f` | n | Add current file to context |
-| `<leader>0s` | v | Add selection to context |
-| `<leader>0l` | n | List sessions |
-| `<leader>0n` | n | New session |
+| `<leader>0f` | n, v | Add file or visual selection to context |
+| `<leader>0s` | n | Session picker |
 | `<leader>0i` | n | Interrupt session |
 | `<leader>0m` | n | Model picker |
-| `<leader>0c` | n, v | Command picker |
-| `<leader>0g` | n | Agent picker |
 | `<leader>0e` | n, v | Inline edit |
 
 ### Chat Buffer
@@ -104,6 +94,8 @@ All keymaps are configurable via the `keymaps` table. Set any key to `""` (empty
 | `q` | Close chat window |
 | `<CR>` | New prompt |
 | `<C-c>` | Interrupt current response |
+| `<Tab>` | Cycle to next agent (per-prompt) |
+| `<S-Tab>` | Cycle to previous agent (per-prompt) |
 | `za` | Toggle fold (tool output) |
 | `zM` | Fold all |
 | `zR` | Unfold all |
@@ -112,18 +104,11 @@ All keymaps are configurable via the `keymaps` table. Set any key to `""` (empty
 
 | Command | Description |
 | --- | --- |
-| `:ZeroOpen` | Open chat window (starts server if needed) |
 | `:ZeroToggle` | Toggle chat window visibility |
-| `:ZeroClose` | Close chat window |
-| `:ZeroAsk [prompt]` | Ask a question (optional inline prompt) |
-| `:ZeroAddFile` | Add current file to context |
-| `:ZeroAddSelection` | Add visual selection to context |
-| `:ZeroSessionList` | Pick a session |
-| `:ZeroSessionNew` | New session |
-| `:ZeroSessionInterrupt` | Interrupt current session |
-| `:ZeroModelList` | Model picker |
-| `:ZeroCommandPicker` | Pick from available commands |
-| `:ZeroAgentPicker` | Pick from available agents |
+| `:ZeroContext` | Add current file (normal mode) or visual selection to context |
+| `:ZeroSession` | Session picker |
+| `:ZeroInterrupt` | Interrupt current session |
+| `:ZeroModel` | Model picker |
 | `:ZeroInlineEdit` | Inline edit at cursor position or visual selection |
 
 ## Chat Window

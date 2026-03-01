@@ -12,8 +12,8 @@ through the provider's SDK (Claude Agent SDK for Claude Code, JSON-RPC app serve
 
 | Provider | ID | CLI binary | Models |
 | --- | --- | --- | --- |
-| Claude Code | `claude-code` | `claude` | `claude-sonnet-4-6` (200K/64K), `claude-opus-4-6` (200K/32K), `claude-haiku-4-5-20251001` (200K/8K) |
-| Codex | `codex` | `codex` | `gpt-5-codex` (272K input, 128K output), `o3` (200K/32K), `o4-mini` (200K/32K) |
+| Claude Code | `claude-code` | `claude` | `claude-sonnet-4-6` (200K context, 64K output), `claude-opus-4-6` (200K context, 32K output), `claude-haiku-4-5-20251001` (200K context, 8K output) |
+| Codex | `codex` | `codex` | `gpt-5-codex` (400K context: 272K input, 128K output; reasoning), `o3` (200K context, 32K output; reasoning), `o4-mini` (200K context, 32K output; reasoning) |
 
 Only providers whose CLI binary is found on `PATH` appear in `0x0 models` and the model picker.
 
@@ -44,7 +44,6 @@ provider:
 | `apiKey` | `string` | -- | API key (supports `{env:VAR}` interpolation) |
 | `baseURL` | `string` | -- | Base URL override for API requests |
 | `enterpriseUrl` | `string` | -- | GitHub Enterprise URL (Copilot provider only) |
-| `setCacheKey` | `boolean` | -- | Enable prompt cache key |
 | `timeout` | `number \| false` | `300000` | Request timeout in ms, or `false` to disable |
 
 ### Model configuration
@@ -97,9 +96,6 @@ Models are sorted by preference: sonnet > gpt-5-codex > opus > o3 > o4-mini > ha
 
 # Verbose output with costs and metadata
 0x0 models --verbose
-
-# Refresh the model cache
-0x0 models --refresh
 ```
 
 ## See also

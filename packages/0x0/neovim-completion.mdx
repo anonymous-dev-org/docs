@@ -47,6 +47,8 @@ All options and their defaults:
 
 ```lua
 require("zeroxzero-completion").setup({
+  server_url = nil,                          -- server URL override (auto-detected from 0x0.nvim)
+  auth = nil,                                -- optional {username = "...", password = "..."}
   model = "claude-haiku-4-5-20251001",       -- model for completions
   max_tokens = 256,                          -- max completion length
   debounce_ms = 150,                         -- wait before requesting

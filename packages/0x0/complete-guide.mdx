@@ -6,6 +6,12 @@ icon: 'book-open'
 
 # 0x0 CLI Guide
 
+0x0 is an open-source AI coding agent inspired by
+[opencode](https://github.com/anomalyco/opencode). Unlike opencode, 0x0 is fully compliant with
+the terms of use of all supported providers -- including Anthropic (Claude Code), OpenAI (Codex),
+and any additional providers added through plugins. You can use it without risk of getting your
+accounts banned.
+
 This guide documents 0x0 in this repository, from installation to advanced configuration.
 
 ## Installation
@@ -61,7 +67,7 @@ Top-level commands:
 - `0x0 acp`: start ACP server (`--cwd` + network options)
 - `0x0 mcp`: MCP server management
 - `0x0 agent`: generate/list agents
-- `0x0 models [provider]`: list models (`--verbose`, `--refresh`)
+- `0x0 models [provider]`: list models (`--verbose`)
 - `0x0 session list`: list sessions (`--max-count`, `--format table|json`)
 - `0x0 stats`: usage/cost stats (`--days`, `--tools`, `--models`, `--project`)
 - `0x0 export [sessionID]`: export session JSON
@@ -146,15 +152,12 @@ These are loaded from project scope and home scope (`~/.zeroxzero/`).
 
 Low to high precedence:
 
-1. Remote `.well-known/zeroxzero` config (when authenticated provider supports it)
-2. Global config (`~/.config/0x0/config.yaml`)
-3. Global provider configs (`~/.config/0x0/providers/*.yaml`)
-4. `ZEROXZERO_CONFIG` file path override
-5. Project config files (`.0x0/config.yaml`, walked upward from cwd to worktree root)
-6. Project provider configs (`.0x0/providers/*.yaml`)
-7. `.zeroxzero` directories (config, commands, agents, plugins -- project dirs upward + `~/.zeroxzero/` + `ZEROXZERO_CONFIG_DIR`)
-8. Inline `ZEROXZERO_CONFIG_CONTENT` JSON
-9. Managed enterprise config directory (highest):
+1. Global config (`~/.config/0x0/config.yaml`)
+2. Global provider configs (`~/.config/0x0/providers/*.yaml`)
+3. Project config files (`.0x0/config.yaml`, walked upward from cwd to worktree root)
+4. Project provider configs (`.0x0/providers/*.yaml`)
+5. `.zeroxzero` directories (config, commands, agents, plugins -- project dirs upward + `~/.zeroxzero/`)
+6. Managed enterprise config directory (highest):
    - macOS: `/Library/Application Support/zeroxzero`
    - Linux: `/etc/zeroxzero`
    - Windows: `%ProgramData%\\zeroxzero`
@@ -301,7 +304,7 @@ Session compaction automatically summarizes older messages when the context wind
 | `model` | `string` | -- | Model for compaction (must be set with `provider`) |
 | `prompt` | `string` | -- | Custom compaction prompt (replaces the default) |
 
-Related env vars: `ZEROXZERO_DISABLE_AUTOCOMPACT`, `ZEROXZERO_DISABLE_PRUNE`.
+Compaction behavior is configured via this config section. There are no environment variable overrides.
 
 ### `share`
 
@@ -447,26 +450,20 @@ Notes:
 
 ## Environment variables
 
-Frequently used flags:
+See [Environment Variables](/packages/0x0/environment-variables) for the full list. Key variables:
 
-- `ZEROXZERO_CONFIG`: explicit config file path
-- `ZEROXZERO_CONFIG_DIR`: explicit extension directory (`.zeroxzero`-style)
-- `ZEROXZERO_CONFIG_CONTENT`: inline JSON config override
-- `ZEROXZERO_DISABLE_PROJECT_CONFIG`: disable project config loading
-- `ZEROXZERO_PERMISSION`: inline JSON permission override
-- `ZEROXZERO_SERVER_USERNAME` / `ZEROXZERO_SERVER_PASSWORD`: server basic auth
-- `ZEROXZERO_AUTO_SHARE`: auto-share override
-- `ZEROXZERO_DISABLE_AUTOCOMPACT`, `ZEROXZERO_DISABLE_PRUNE`: compaction overrides
-- `ZEROXZERO_DISABLE_AUTOUPDATE`: disable auto-update checks
+- `ZEROXZERO_CLIENT`: client type (`app`, `cli`, `desktop`, `acp`)
+- `ZEROXZERO_DISABLE_SHARE`: disable session sharing
 
-There are additional experimental flags in `packages/0x0/src/flag/flag.ts`.
+Most configuration is done via `config.yaml` rather than environment variables. Use `{env:VAR_NAME}`
+interpolation in config files to reference any environment variable.
 
 ## Troubleshooting
 
 - Show resolved config: `0x0 debug config`
 - Show paths: `0x0 debug paths`
 - List known projects: `0x0 debug scrap`
-- Check models: `0x0 models --refresh`
+- Check models: `0x0 models`
 - Check MCP status: `0x0 mcp list` and `0x0 mcp auth list`
 - Run without TUI: `0x0 run "diagnose this repo" --format json`
 
