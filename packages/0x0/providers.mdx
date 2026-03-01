@@ -4,32 +4,21 @@ description: 'Configure LLM providers, models, and API settings'
 icon: 'cloud'
 ---
 
-0x0 bundles integrations for 20+ LLM providers. Each provider can be configured globally or per
-project with API keys, model filtering, and custom endpoints.
+0x0 delegates LLM inference to external provider SDKs. Each provider requires a corresponding CLI
+binary on your `PATH` for authentication and availability detection, but actual inference runs
+through the provider's SDK (Claude Agent SDK for Claude Code, JSON-RPC app server for Codex).
 
-## Bundled providers
+## Built-in providers
 
-| Provider | ID | Notes |
-| --- | --- | --- |
-| Anthropic | `anthropic` | Claude models |
-| OpenAI | `openai` | GPT and o-series models |
-| Google AI | `google` | Gemini models |
-| AWS Bedrock | `amazon-bedrock` | Requires AWS credentials |
-| Azure OpenAI | `azure` | Requires Azure deployment |
-| xAI | `xai` | Grok models |
-| Groq | `groq` | Fast inference |
-| Mistral | `mistral` | Mistral and Codestral |
-| Cohere | `cohere` | Command models |
-| DeepInfra | `deepinfra` | Multi-model hosting |
-| Cerebras | `cerebras` | Fast inference |
-| OpenRouter | `openrouter` | Multi-provider routing |
-| Perplexity | `perplexity` | Search-augmented models |
-| TogetherAI | `togetherai` | Open-source model hosting |
-| Vercel | `vercel` | Vercel AI Gateway |
-| GitLab | `gitlab` | GitLab Duo |
-| GitHub Copilot | `copilot` | GitHub Copilot models |
-| Antigravity | `antigravity` | Antigravity managed models |
-| Google Vertex | `google-vertex` | Google Cloud Vertex AI |
+| Provider | ID | CLI binary | Models |
+| --- | --- | --- | --- |
+| Claude Code | `claude-code` | `claude` | `claude-sonnet-4-6` (200K/64K), `claude-opus-4-6` (200K/32K), `claude-haiku-4-5-20251001` (200K/8K) |
+| Codex | `codex` | `codex` | `gpt-5-codex` (272K input, 128K output), `o3` (200K/32K), `o4-mini` (200K/32K) |
+
+Only providers whose CLI binary is found on `PATH` appear in `0x0 models` and the model picker.
+
+Additional providers (Copilot, GitLab, Antigravity) can be made available through
+[plugins](/packages/0x0/plugins) that register `auth` hooks.
 
 ## Provider config
 
@@ -37,13 +26,11 @@ Configure providers in `config.yaml` under the `provider` key:
 
 ```yaml
 provider:
-  openai:
+  claude-code:
     options:
-      apiKey: '{env:OPENAI_API_KEY}'
-      baseURL: https://api.openai.com/v1
       timeout: 300000
     models:
-      gpt-4.1:
+      claude-sonnet-4-6:
         variants:
           low: {}
           medium: {}
@@ -77,37 +64,27 @@ The filename (without `.yaml`) becomes the provider ID. These files use the same
 ## Setting the default model
 
 ```yaml
-model: anthropic/claude-sonnet-4
+model: claude-code/claude-sonnet-4-6
 ```
 
 The format is `provider-id/model-id`. This can be overridden per-agent or via the `--model` CLI
 flag.
 
-A separate `small_model` field sets the model used for lightweight tasks like title generation:
+A separate `small_model` field sets the model used for lightweight tasks like title generation.
+The small model is auto-detected from the active provider (prefers haiku/mini/nano variants):
 
 ```yaml
-small_model: openai/gpt-4.1-mini
+small_model: claude-code/claude-haiku-4-5-20251001
 ```
 
-## Authentication
+## Model selection priority
 
-Manage provider credentials:
+1. `--model` CLI flag
+2. Agent-level `model` setting
+3. `model` in config
+4. Default: `claude-code/claude-sonnet-4-6` (if `claude` binary is on PATH)
 
-```bash
-# Interactive login (provider selection, OAuth or API key)
-0x0 auth login
-
-# Log in to a specific provider URL
-0x0 auth login https://api.openai.com
-
-# List configured providers and env var status
-0x0 auth list
-
-# Log out
-0x0 auth logout
-```
-
-Credentials are stored in `~/.config/0x0/auth.json`.
+Models are sorted by preference: sonnet > gpt-5-codex > opus > o3 > o4-mini > haiku.
 
 ## Listing models
 
@@ -116,7 +93,7 @@ Credentials are stored in `~/.config/0x0/auth.json`.
 0x0 models
 
 # Filter by provider
-0x0 models anthropic
+0x0 models claude-code
 
 # Verbose output with costs and metadata
 0x0 models --verbose
@@ -125,11 +102,9 @@ Credentials are stored in `~/.config/0x0/auth.json`.
 0x0 models --refresh
 ```
 
-Model definitions are fetched from [models.dev](https://models.dev) and cached locally. Use
-`models_url` or `models_path` in config to override the source.
-
 ## See also
 
+- [Plugins](/packages/0x0/plugins) -- extend with additional provider auth
 - [CLI Reference](/packages/0x0/cli-reference)
 - [Environment Variables](/packages/0x0/environment-variables)
 - [Complete CLI Guide](/packages/0x0/complete-guide)

@@ -23,7 +23,6 @@ These options are available on all commands:
 - `0x0 attach <url>`: connect TUI to running server
 - `0x0 server`: start headless HTTP server (alias: `serve`)
 - `0x0 acp`: start ACP server over stdio
-- `0x0 auth`: manage provider credentials
 - `0x0 mcp`: manage MCP servers and OAuth auth
 - `0x0 agent`: create/list agents
 - `0x0 models [provider]`: list model IDs
@@ -103,15 +102,6 @@ Subcommands:
 - `0x0 mcp logout [name]`: remove OAuth credentials for a server
 - `0x0 mcp debug <name>`: debug OAuth connection for a server
 
-## `0x0 auth`
-
-Subcommands:
-
-- `0x0 auth login [url]`: log in to a provider
-- `0x0 auth logout`: log out from a configured provider
-- `0x0 auth list` (alias: `ls`): list providers
-- `0x0 auth accounts`: manage Antigravity accounts
-
 ## `0x0 agent`
 
 Subcommands:
@@ -131,7 +121,7 @@ Subcommands:
 Options:
 
 - `--verbose`: use more verbose model output (includes metadata like costs)
-- `--refresh`: refresh the models cache from models.dev
+- `--refresh`: refresh the models cache
 
 ## `0x0 stats`
 

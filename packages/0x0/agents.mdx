@@ -11,9 +11,9 @@ access, permissions, and model settings.
 
 0x0 ships with two visible agents and several hidden internal agents.
 
-### Builder (default)
+### Builder
 
-The default agent with full tool access for writing and shipping code.
+Full tool access agent for writing and shipping code.
 
 | Setting | Value |
 | --- | --- |
@@ -44,8 +44,10 @@ These agents are used internally and do not appear in the agent picker:
 - **Compaction** -- summarizes conversation history during context compaction
 - **Title** -- generates session titles (temperature 0.5)
 - **Summary** -- generates session summaries
-- **Explore** -- used by the `task` tool for codebase exploration subtasks
-- **General** -- used by the `task` tool for general-purpose subtasks
+
+The `explore` and `general` agent names are reserved as native identifiers for the `task` tool
+(codebase exploration and general-purpose subtasks), but they are only created if explicitly defined
+in config.
 
 ## Default agent selection
 
@@ -84,6 +86,7 @@ The filename (without `.md`) becomes the agent's identifier.
 | `disable` | `boolean` | Disable this agent entirely |
 | `knowledge_base` | `string[]` | Agent-specific knowledge snippets |
 | `permission` | `object` | Per-agent permission overrides (see [Permissions](/packages/0x0/permissions)) |
+| `actions` | `object` | Per-provider tool action policies (auto-managed by "Always Allow"/"Always Deny" in TUI) |
 | `options` | `object` | Arbitrary extra options |
 
 The markdown body becomes the agent's system prompt.

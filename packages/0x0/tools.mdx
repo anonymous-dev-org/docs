@@ -7,53 +7,41 @@ icon: 'wrench'
 Tools are the actions that agents can invoke during a session. Each tool has a defined schema,
 permission requirements, and output format.
 
-## Built-in tools
+## Registered tools
 
-### File operations
-
-| Tool | Description |
-| --- | --- |
-| `read` | Read file contents with optional offset and line limit |
-| `write` | Write content to a file (creates or overwrites) |
-| `edit` | Make targeted string replacements in a file |
-| `multiedit` | Apply edits across multiple files in a single call |
-| `apply_patch` | Apply a unified diff patch to one or more files |
-| `glob` | Match files by glob pattern |
-| `grep` | Search file contents using regular expressions |
-| `ls` | List directory contents |
-
-### Search
-
-| Tool | Description |
-| --- | --- |
-| `search` | Search files by content (grep mode) or by name (glob mode) |
-| `search_remote` | Web search, URL fetch, or code search (unified remote search) |
-| `websearch` | Web search (legacy, maps to `search_remote` mode `web`) |
-| `webfetch` | Fetch URL content (legacy, maps to `search_remote` mode `fetch`) |
-| `codesearch` | Code search (legacy, maps to `search_remote` mode `code`) |
-
-### Execution
+These tools are registered in the tool registry and available to agents by default:
 
 | Tool | Description |
 | --- | --- |
 | `bash` | Execute shell commands with configurable timeout |
-
-### Agent and workflow
-
-| Tool | Description |
-| --- | --- |
+| `read` | Read file contents with optional offset and line limit |
+| `search` | Search files by content (grep mode) or by name (glob mode) |
+| `search_remote` | Web search, URL fetch, or code search (unified remote search) |
+| `apply_patch` | Apply a unified diff patch to one or more files |
 | `task` | Delegate work to a sub-agent (handoff or background) |
 | `todowrite` | Create and update structured TODO lists |
 | `question` | Ask the user interactive questions with options |
+| `lsp` | Language Server Protocol operations (experimental, requires `experimental.lsp_tool: true`) |
 
-### Protocol and integration
+## Provider-delegated tools
 
-| Tool | Description |
-| --- | --- |
-| `lsp` | Language Server Protocol operations (diagnostics, symbols, hover) |
-| `skill` | Invoke a discovered skill |
-| `batch` | Batch multiple operations (experimental) |
-| `external-directory` | Access directories outside the project root |
+When 0x0 delegates to a CLI provider (Claude Code or Codex), the provider brings its own tool set.
+These tools execute inside the provider's runtime, not 0x0's tool registry. 0x0 maps them to
+permissions for access control:
+
+| Tool | Permission | Description |
+| --- | --- | --- |
+| `Edit` | `edit` | Make targeted string replacements in a file |
+| `Write` | `edit` | Write content to a file (creates or overwrites) |
+| `MultiEdit` | `edit` | Apply edits across multiple files in a single call |
+| `NotebookEdit` | `edit` | Edit Jupyter notebook cells |
+| `Glob` | `search` | Match files by glob pattern |
+| `Grep` | `search` | Search file contents using regular expressions |
+| `Bash` | `bash` | Execute shell commands |
+| `Read` | `read` | Read file contents |
+| `WebFetch` | `web` | Fetch URL content |
+| `WebSearch` | `web` | Web search |
+| `Task` | `task` | Delegate subtasks |
 
 ## Permission mapping
 
@@ -64,20 +52,21 @@ Multiple tools can map to the same permission. Configuring a permission affects 
 | `read` | `read` |
 | `edit` | `edit`, `write`, `apply_patch`, `multiedit` |
 | `search` | `search`, `glob`, `grep`, `ls` |
-| `search_remote` | `search_remote`, `websearch`, `webfetch`, `codesearch` |
+| `search_remote` | `search_remote` (0x0 registered tool) |
+| `web` | `WebFetch`, `WebSearch` (provider-delegated tools) |
 | `bash` | `bash` |
 | `task` | `task` |
-| `external_directory` | `external-directory` |
 | `todowrite` | `todowrite` |
 | `question` | `question` |
 | `lsp` | `lsp` |
 | `skill` | `skill` |
+| `external_directory` | Access to directories outside the project root (checked by `read`, `search`, `edit`, and other file-based tools) |
 
 See [Permissions](/packages/0x0/permissions) for how to configure access rules.
 
 ## Legacy tool name migrations
 
-Older tool names are automatically migrated:
+Older tool names in config are automatically migrated:
 
 | Legacy name | Current equivalent |
 | --- | --- |

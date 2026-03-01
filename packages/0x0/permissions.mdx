@@ -34,10 +34,11 @@ Rules are evaluated using **last-match-wins** semantics. If no rule matches, the
 | `read` | `read` tool | File read operations |
 | `edit` | `edit`, `write`, `apply_patch`, `multiedit` | File write and edit operations |
 | `search` | `search` tool | File search (content grep and file glob) |
-| `search_remote` | `search_remote`, `websearch`, `webfetch`, `codesearch` | Web search and URL fetch |
+| `search_remote` | `search_remote` (0x0 registered tool) | Web search and URL fetch |
+| `web` | `WebFetch`, `WebSearch` (provider-delegated) | Provider SDK web tools |
 | `bash` | `bash` tool | Shell command execution |
 | `task` | `task` tool | Subtask creation / agent delegation |
-| `external_directory` | `external-directory` tool | Access to directories outside the project |
+| `external_directory` | `read`, `search`, `edit`, and other file-based tools | Access to directories outside the project root |
 | `todowrite` | `todowrite` tool | Writing TODO items |
 | `todoread` | (internal) | Reading TODO items |
 | `question` | `question` tool | Asking the user interactive questions |
@@ -127,11 +128,19 @@ When a tool call resolves to `ask`:
 1. A permission request is created and the tool call blocks.
 2. The user sees the request in the TUI and can respond with:
    - **Allow once** -- resolves this single request
-   - **Allow always** -- adds a permanent `allow` rule for this permission and pattern, and
-     auto-resolves any other pending requests now covered
+   - **Allow always** -- adds a permanent `allow` rule and auto-resolves other pending requests
+     now covered. The rule is persisted to `agent.<name>.actions.<provider>.<tool>` in config.
+   - **Deny always** -- adds a permanent `deny` rule for this permission and pattern, persisted
+     to config
    - **Reject** -- rejects this request and all other pending requests for the session
 
 Plugins can intercept permission requests via the `permission.ask` hook to auto-allow or auto-deny.
+
+### Persistence
+
+When a user chooses "Allow always" or "Deny always", the decision is persisted to the config file
+under `agent.<agentName>.actions.<providerID>.<toolName>`. This uses the provider SDK's tool names
+(e.g., `Bash`, `Edit`, `WebFetch`), not the 0x0 permission names.
 
 ## Error types
 

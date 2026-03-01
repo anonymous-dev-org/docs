@@ -59,7 +59,6 @@ Top-level commands:
 - `0x0 attach <url>`: attach TUI to server (`--dir`, `--session`, `--password`)
 - `0x0 server` (alias: `serve`): start headless server (network options)
 - `0x0 acp`: start ACP server (`--cwd` + network options)
-- `0x0 auth`: credential management
 - `0x0 mcp`: MCP server management
 - `0x0 agent`: generate/list agents
 - `0x0 models [provider]`: list models (`--verbose`, `--refresh`)
@@ -128,7 +127,7 @@ Provider-specific config can be stored in `providers/*.yaml` directories:
 - **Global**: `~/.config/0x0/providers/<provider-id>.yaml`
 - **Project**: `.0x0/providers/<provider-id>.yaml`
 
-The provider ID is derived from the filename (e.g., `anthropic.yaml` registers provider `anthropic`).
+The provider ID is derived from the filename (e.g., `claude-code.yaml` registers provider `claude-code`).
 These files are parsed against the `provider` config schema and merged into the main config at
 their respective precedence levels.
 
@@ -139,7 +138,6 @@ In addition to YAML config files, 0x0 loads extension content from `.zeroxzero` 
 - `.zeroxzero/config.yaml`
 - `.zeroxzero/agent/**/*.md` or `.zeroxzero/agents/**/*.md`
 - `.zeroxzero/command/**/*.md` or `.zeroxzero/commands/**/*.md`
-- `.zeroxzero/mode/*.md` or `.zeroxzero/modes/*.md`
 - `.zeroxzero/plugin/*.{ts,js}` or `.zeroxzero/plugins/*.{ts,js}`
 
 These are loaded from project scope and home scope (`~/.zeroxzero/`).
@@ -170,10 +168,9 @@ layers rather than replaced.
 # yaml-language-server: $schema=https://zeroxzero.ai/config.json
 $schema: https://zeroxzero.ai/config.json
 
-theme: zeroxzero
 logLevel: INFO
-model: zeroxzero/gpt-5.1
-default_agent: build
+model: claude-code/claude-sonnet-4-6
+default_agent: builder
 share: manual
 autoupdate: notify
 
@@ -186,9 +183,8 @@ server:
     - https://example.com
 
 provider:
-  openai:
+  claude-code:
     options:
-      apiKey: '{env:OPENAI_API_KEY}'
       timeout: 300000
 
 mcp:
@@ -203,8 +199,7 @@ mcp:
       clientSecret: '{file:./secrets/mcp-client-secret.txt}'
 
 compaction:
-  auto: true
-  prune: true
+  max_words_before_compact: 12000
 
 experimental:
   batch_tool: true
@@ -221,8 +216,8 @@ Use project config for repo-specific behavior.
 # yaml-language-server: $schema=https://zeroxzero.ai/config.json
 $schema: https://zeroxzero.ai/config.json
 
-model: anthropic/claude-sonnet-4
-default_agent: plan
+model: claude-code/claude-sonnet-4-6
+default_agent: planner
 knowledge_base:
   - This repo uses Bun workspaces
   - Use `bun test` for tests
@@ -392,12 +387,26 @@ knowledge_base:
   - The API uses Hono framework
 ```
 
+### `instructions`
+
+Additional instruction files, globs, or URLs injected into agent system prompts:
+
+```yaml
+instructions:
+  - ./.zeroxzero/policy/*.md
+  - ./.zeroxzero/memory.md
+  - https://example.com/team-standards.md
+```
+
+Paths are resolved relative to the config file's directory. HTTP/HTTPS URLs are fetched at runtime.
+When merging configs across scopes, `instructions` arrays are concatenated and deduplicated.
+
 ### `small_model`
 
 Model used for lightweight tasks like title generation:
 
 ```yaml
-small_model: openai/gpt-4.1-mini
+small_model: claude-code/claude-haiku-4-5-20251001
 ```
 
 ### `experimental`
@@ -408,7 +417,6 @@ Feature toggles for experimental functionality:
 | --- | --- | --- |
 | `batch_tool` | `boolean` | Enable the batch tool |
 | `mcp_timeout` | `number` | MCP request timeout in ms |
-| `filewatcher` | `boolean` | Enable experimental file watcher |
 | `disable_filewatcher` | `boolean` | Disable file watcher |
 | `icon_discovery` | `boolean` | Enable icon discovery for projects |
 | `exa` | `boolean` | Enable Exa search integration |
