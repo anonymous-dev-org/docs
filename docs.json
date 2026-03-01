@@ -19,31 +19,6 @@
         ]
       },
       {
-        "tab": "🔥 Firetype",
-        "groups": [
-          {
-            "group": "Getting Started",
-            "pages": ["packages/firetype/index"]
-          },
-          {
-            "group": "Guides",
-            "pages": [
-              "packages/firetype/schema-guide",
-              "packages/firetype/cli-reference",
-              "packages/firetype/examples"
-            ]
-          },
-          {
-            "group": "API Reference",
-            "pages": ["packages/firetype/api-reference"]
-          },
-          {
-            "group": "Help",
-            "pages": ["packages/firetype/troubleshooting"]
-          }
-        ]
-      },
-      {
         "tab": "0x0",
         "groups": [
           {
@@ -83,6 +58,31 @@
               "packages/0x0/acp",
               "packages/0x0/complete-guide"
             ]
+          }
+        ]
+      },
+      {
+        "tab": "Firetype",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": ["packages/firetype/index"]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "packages/firetype/schema-guide",
+              "packages/firetype/cli-reference",
+              "packages/firetype/examples"
+            ]
+          },
+          {
+            "group": "API Reference",
+            "pages": ["packages/firetype/api-reference"]
+          },
+          {
+            "group": "Help",
+            "pages": ["packages/firetype/troubleshooting"]
           }
         ]
       }
