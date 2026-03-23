@@ -1,42 +1,75 @@
 ---
 title: 'Network'
-description: 'Hostname, port, mDNS, and CORS options for 0x0 services'
+description: 'Hostname, port, and CORS options'
 icon: 'globe'
 ---
 
-The CLI exposes shared network flags for commands that can host a server.
+## Network flags
 
-## Commands that accept network flags
+The `serve` command accepts these network flags:
 
-- `0x0 [project]`
-- `0x0 server` (alias `serve`)
-- `0x0 acp`
+| Flag | Default | Description |
+| --- | --- | --- |
+| `--port` | `0` | Port to listen on |
+| `--hostname` | `127.0.0.1` | Hostname to bind |
+| `--cors <origin>` | `[]` | Additional CORS origins (repeatable) |
 
-## Shared flags
+## Port behavior
 
-- `--port` (default `0`)
-- `--hostname` (default `127.0.0.1`)
-- `--mdns` (default `false`)
-- `--mdns-domain` (default `zeroxzero.local`)
-- `--cors <origin>` (repeatable)
+When `--port 0` (the default):
+1. Try port 4096
+2. If 4096 is busy, pick a random available port
 
-## Behavior details
+When a specific port is given, the server fails if that port is unavailable.
 
-- If `--mdns` is enabled and hostname is not explicitly set in config/CLI, host binding defaults to
-  `0.0.0.0`.
-- For TUI startup, server mode is started only when network settings require external access.
+## Resolution priority
+
+CLI flags override config file values:
+
+1. `--port` flag
+2. `server.port` in `~/.config/0x0/config.json`
+3. Default (`0`)
+
+Same for `--hostname` and `--cors`.
+
+## CORS
+
+Requests from `localhost` and `127.0.0.1` are always allowed. Additional origins can be added via `--cors` or `server.cors` in config.
 
 ## Examples
 
 ```bash
-# Start headless server on fixed port with mDNS
-0x0 server --port 4096 --mdns --mdns-domain zeroxzero.local
+# Default: localhost:4096
+0x0
 
-# Start headless server allowing a specific browser origin
-0x0 server --hostname 0.0.0.0 --port 4096 --cors https://app.example.com
+# Fixed port, all interfaces
+0x0 --hostname 0.0.0.0 --port 4096
+
+# Allow a specific browser origin
+0x0 --port 4096 --cors https://my-app.example.com
 ```
 
-See also:
+## mDNS service discovery
 
-- [Complete CLI Guide](/packages/0x0/complete-guide)
-- [Server](/packages/0x0/server)
+The server can advertise itself on the local network via mDNS (Bonjour/Zeroconf), allowing clients to discover it automatically without knowing the port.
+
+Enable in config:
+
+```json
+{
+  "server": {
+    "mdns": true,
+    "mdnsDomain": "my-machine"
+  }
+}
+```
+
+| Field | Default | Description |
+| --- | --- | --- |
+| `server.mdns` | `false` | Enable mDNS advertisement |
+| `server.mdnsDomain` | hostname | Custom domain name for the mDNS service |
+
+## See also
+
+- [Server](/packages/0x0/server) -- full server configuration
+- [CLI Reference](/packages/0x0/cli-reference) -- all commands and flags

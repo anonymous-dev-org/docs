@@ -4,258 +4,79 @@ description: 'Commands and flags for 0x0'
 icon: 'book-open'
 ---
 
-Use this page as a command and flags index for the current 0x0.
-
 ## Global options
 
-These options are available on all commands:
+Available on all commands:
 
 - `-h`, `--help`: show command help
-- `-v`, `--version`: print installed CLI version
+- `-v`, `--version`: print installed version
 - `--print-logs`: print runtime logs to `stderr`
 - `--log-level DEBUG|INFO|WARN|ERROR`: set log level
 
-## Main commands
+## `0x0` (default: serve)
 
-- `0x0 [project]`: start the TUI session
-- `0x0 completion`: print shell completion script
-- `0x0 run [message..]`: non-interactive prompt execution
-- `0x0 attach <url>`: connect TUI to running server
-- `0x0 server`: start headless HTTP server (alias: `serve`)
-- `0x0 acp`: start ACP server over stdio
-- `0x0 mcp`: manage MCP servers and OAuth auth
-- `0x0 agent`: create/list agents
-- `0x0 models [provider]`: list model IDs
-- `0x0 stats`: usage and cost stats
-- `0x0 session list`: list sessions
-- `0x0 export [sessionID]`: export session JSON
-- `0x0 import <file-or-url>`: import session JSON/share URL
-- `0x0 github`: install/run GitHub agent integration
-- `0x0 pr <number>`: checkout PR branch and launch 0x0
-- `0x0 upgrade [target]`: upgrade installation
-- `0x0 uninstall`: remove installation and data
-- `0x0 debug`: diagnostics and low-level debug utilities
-- `0x0 generate`: output the OpenAPI specification as JSON
+Start the completion server. This is the default command.
 
-## `0x0 [project]` (TUI)
+```bash
+0x0
+0x0 serve
+0x0 --port 4096 --hostname 0.0.0.0
+```
 
 Options:
 
-- `--model`, `-m`: model to use in the format of provider/model
-- `--continue`, `-c`: continue the last session
-- `--session`, `-s`: session id to continue
-- `--fork`: fork the session when continuing (use with `--continue` or `--session`)
-- `--prompt`: prompt to use
-- `--agent`: agent to use
-- network flags: `--port`, `--hostname`, `--mdns`, `--mdns-domain`, `--cors`
+- `--port` (default `0` -- tries 4096, then random)
+- `--hostname` (default `127.0.0.1`)
+- `--cors <origin>` (repeatable)
+
+## `0x0 commit-msg`
+
+Generate a commit message from staged changes.
+
+```bash
+0x0 commit-msg
+0x0 commit-msg --provider claude --model claude-sonnet-4-6
+0x0 commit-msg --verbose
+```
+
+Options:
+
+- `--provider`: `claude` or `codex` (default: auto-detect)
+- `--model`: model ID (default: per-provider)
+- `--verbose`: enable debug output
+
+## `0x0 hook <install|uninstall>`
+
+Manage the `prepare-commit-msg` git hook.
+
+```bash
+0x0 hook install
+0x0 hook uninstall
+```
 
 ## `0x0 completion`
 
-Outputs a shell completion script. Source the output in your shell profile:
+Output shell completion script:
 
 ```bash
-# bash
-eval "$(0x0 completion)"
-
-# zsh
+# bash / zsh
 eval "$(0x0 completion)"
 ```
 
-## `0x0 run [message..]`
-
-Options:
-
-- `--command <name>`: execute a slash command
-- `--continue`, `-c`: continue the last session
-- `--session`, `-s`: session id to continue
-- `--fork`: fork the session before continuing (requires `--continue` or `--session`)
-- `--share`: share the session
-- `--model`, `-m`: model to use in the format of provider/model
-- `--agent <name>`: agent to use
-- `--format default|json`: output format (default: `default`)
-- `--file`, `-f` (repeatable): file(s) to attach to message
-- `--title [value]`: title for the session (uses truncated prompt if no value provided)
-- `--attach <url>`: attach to a running 0x0 server
-- `--port <number>`: port for the local server (defaults to random port)
-- `--variant <value>`: model variant / reasoning effort (e.g., `high`, `max`, `minimal`)
-- `--thinking`: show thinking blocks (default: `false`)
-
-## `0x0 server` (alias: `serve`)
-
-Starts a headless 0x0 server.
-
-Options: network flags only (`--port`, `--hostname`, `--mdns`, `--mdns-domain`, `--cors`).
-
-## `0x0 attach <url>`
-
-Options:
-
-- `--dir`: directory to run in
-- `--session`, `-s`: session id to continue
-- `--password`, `-p`: basic auth password (defaults to `server.password` in config.yaml)
-
-## `0x0 acp`
-
-Start ACP (Agent Client Protocol) server.
-
-Options:
-
-- `--cwd`: working directory (default: current directory)
-- network flags: `--port`, `--hostname`, `--mdns`, `--mdns-domain`, `--cors`
-
-## `0x0 mcp`
-
-Subcommands:
-
-- `0x0 mcp add`: add an MCP server (interactive)
-- `0x0 mcp list` (alias: `ls`): list MCP servers and their status
-- `0x0 mcp auth [name]`: authenticate with an OAuth-enabled MCP server
-- `0x0 mcp auth list` (alias: `ls`): list OAuth-capable servers and auth status
-- `0x0 mcp logout [name]`: remove OAuth credentials for a server
-- `0x0 mcp debug <name>`: debug OAuth connection for a server
-
-## `0x0 agent`
-
-Subcommands:
-
-- `0x0 agent create`: create a new agent
-- `0x0 agent list`: list all available agents
-
-`0x0 agent create` options:
-
-- `--path`: directory path to generate the agent file
-- `--description`: what the agent should do
-- `--tools`: comma-separated list of tools to enable (default: all). Available: `Bash`, `Read`, `Edit`, `Write`, `MultiEdit`, `Glob`, `Grep`, `WebFetch`, `WebSearch`, `Task`, `TodoWrite`, `AskUserQuestion`
-- `--model`, `-m`: model to use in the format of provider/model
-
-## `0x0 models [provider]`
-
-Options:
-
-- `--verbose`: use more verbose model output (includes metadata like costs)
-
-## `0x0 stats`
-
-Options:
-
-- `--days`: show stats for the last N days (default: all time)
-- `--tools`: number of tools to show (default: all)
-- `--models`: show model statistics. Pass a number to show top N, otherwise shows all (default: hidden)
-- `--project`: filter by project (default: all projects; empty string: current project)
-
-## `0x0 session`
-
-Subcommands:
-
-- `0x0 session list`: list sessions
-
-`0x0 session list` options:
-
-- `--max-count`, `-n`: limit to N most recent sessions
-- `--format table|json`: output format (default: `table`)
-
-## `0x0 export [sessionID]`
-
-Export session data as JSON. If no `sessionID` is provided, exports the most recent session.
-
-## `0x0 import <file>`
-
-Import session data from a JSON file or share URL.
-
-## `0x0 github`
-
-Subcommands:
-
-- `0x0 github install`: install the GitHub agent (interactive)
-- `0x0 github run`: run the GitHub agent
-
-`0x0 github run` options:
-
-- `--event`: GitHub mock event to run the agent for
-- `--token`: GitHub personal access token (`github_pat_*`)
-
-## `0x0 pr <number>`
-
-Fetch and checkout a GitHub PR branch, then run 0x0.
-
-## `0x0 upgrade [target]`
-
-Upgrade 0x0 to the latest or a specific version (e.g., `0.1.48` or `v0.1.48`).
-
-Options:
-
-- `--method`, `-m`: installation method to use. Choices: `curl`, `npm`, `pnpm`, `bun`, `brew`, `choco`, `scoop`
-
-## `0x0 uninstall`
-
-Remove 0x0 installation and all related files.
-
-Options:
-
-- `--keep-config`, `-c`: keep configuration files (default: `false`)
-- `--keep-data`, `-d`: keep session data and snapshots (default: `false`)
-- `--dry-run`: show what would be removed without removing (default: `false`)
-- `--force`, `-f`: skip confirmation prompts (default: `false`)
-
-## `0x0 generate`
-
-Output the OpenAPI specification for the 0x0 HTTP server as JSON to stdout. Includes `x-codeSamples`
-metadata with `@0x0-ai/sdk` usage examples for each endpoint.
-
-## `0x0 debug`
-
-Subcommands:
-
-- `debug config`: show resolved configuration
-- `debug paths`: show global paths (data, config, cache, state)
-- `debug scrap`: list all known projects
-- `debug skill`: list all available skills
-- `debug agent <name>`: show agent configuration details (`--tool`, `--params`)
-- `debug wait`: wait indefinitely (for debugging)
-
-### `debug lsp`
-
-- `debug lsp diagnostics <file>`: get diagnostics for a file
-- `debug lsp symbols <query>`: search workspace symbols
-- `debug lsp document-symbols <uri>`: get symbols from a document
-
-### `debug rg`
-
-- `debug rg tree`: show file tree using ripgrep (`--limit`)
-- `debug rg files`: list files using ripgrep (`--query`, `--glob`, `--limit`)
-- `debug rg search <pattern>`: search file contents (`--glob`, `--limit`)
-
-### `debug file`
-
-- `debug file search <query>`: search files by query
-- `debug file read <path>`: read file contents as JSON
-- `debug file status`: show file status information
-- `debug file list <path>`: list files in a directory
-- `debug file tree [dir]`: show directory tree
-
-### `debug snapshot`
-
-- `debug snapshot track`: track current snapshot state
-- `debug snapshot patch <hash>`: show patch for a snapshot hash
-- `debug snapshot diff <hash>`: show diff for a snapshot hash
-
 ## Network flags
 
-Shared by `0x0 [project]`, `0x0 server`/`serve`, and `0x0 acp`:
+Shared by the `serve` command:
 
-- `--port` (default `0`)
-- `--hostname` (default `127.0.0.1`)
-- `--mdns` (default `false`)
-- `--mdns-domain` (default `zeroxzero.local`)
-- `--cors <origin>` (repeatable)
+| Flag | Default | Description |
+| --- | --- | --- |
+| `--port` | `0` | Port to listen on (0 = try 4096, then random) |
+| `--hostname` | `127.0.0.1` | Hostname to bind |
+| `--cors` | `[]` | Additional CORS origins (repeatable) |
 
-## Related pages
+Config file values (`server.port`, `server.hostname`, `server.cors`) are used as defaults. CLI flags override config.
 
-- [Complete CLI Guide](/packages/0x0/complete-guide)
-- [Agents](/packages/0x0/agents)
-- [Tools](/packages/0x0/tools)
-- [Permissions](/packages/0x0/permissions)
-- [Providers](/packages/0x0/providers)
-- [Environment Variables](/packages/0x0/environment-variables)
-- [Server](/packages/0x0/server)
-- [ACP](/packages/0x0/acp)
+## See also
+
+- [Server](/packages/0x0/server) -- configuration and endpoints
+- [Git Commit](/packages/0x0/git) -- commit message generation details
+- [Network](/packages/0x0/network) -- network configuration details

@@ -1,41 +1,94 @@
 ---
 title: 'Server'
-description: 'Run and integrate with the 0x0 headless HTTP server'
+description: 'Run and configure the 0x0 completion server'
 icon: 'server'
 ---
 
-Use server mode when you want browser clients or remote tooling to connect over HTTP.
+The default command starts the HTTP server.
 
-## Commands
+## Starting the server
 
-- `0x0 server` (alias `serve`): start headless server and keep process running
-- `0x0 attach <url>`: connect local TUI to a remote running server
+```bash
+# Default: tries port 4096, then random
+0x0
+
+# Explicit port
+0x0 --port 4096
+
+# Listen on all interfaces
+0x0 --hostname 0.0.0.0 --port 4096
+```
+
+## Configuration
+
+Server settings live in `~/.config/0x0/config.json`:
+
+```json
+{
+  "server": {
+    "port": 4096,
+    "hostname": "127.0.0.1",
+    "password": "your-secret",
+    "username": "zeroxzero",
+    "cors": ["https://my-app.example.com"],
+    "mdns": true,
+    "mdnsDomain": "my-machine"
+  },
+  "completion": {
+    "default_model": "claude-haiku-4-5-20251001",
+    "default_provider": "claude",
+    "memory_enabled": true,
+    "memory_max_entries": 500
+  },
+  "git": {
+    "default_model": "claude-haiku-4-5-20251001"
+  }
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `server.port` | `number` | Port to listen on |
+| `server.hostname` | `string` | Hostname to bind |
+| `server.password` | `string` | Password for HTTP Basic Auth |
+| `server.username` | `string` | Username for HTTP Basic Auth (default: `zeroxzero`) |
+| `server.cors` | `string[]` | Additional CORS origins |
+| `server.mdns` | `boolean` | Enable mDNS service discovery |
+| `server.mdnsDomain` | `string` | Custom domain name for mDNS |
+| `completion.default_model` | `string` | Default model for completions |
+| `completion.default_provider` | `"claude" \| "codex"` | Default provider |
+| `completion.memory_enabled` | `boolean` | Enable completion memory |
+| `completion.memory_max_entries` | `number` | Max memory entries (default: 500) |
+| `git.default_model` | `string` | Default model for commit messages |
 
 ## Security
 
-- Set `server.password` in `config.yaml` to require basic auth.
-- `server` warns if password is not set.
-- `attach` supports `--password` and falls back to `server.password` in config.
+If `server.password` is set, all requests require HTTP Basic Auth. The server warns on startup if no password is configured.
 
-## `0x0 attach` options
-
-- `--dir <path>`: request server to use a specific directory context
-- `--session`, `-s`: continue a given session id
-- `--password`, `-p`: basic auth password
-
-## Examples
+## Health check
 
 ```bash
-# Host local server
-0x0 server --hostname 127.0.0.1 --port 4096
-
-# Host for LAN access with mDNS
-0x0 server --hostname 0.0.0.0 --port 4096 --mdns
-
-# Attach local TUI to remote server
-0x0 attach https://my-host:4096 --password "your-password"
+curl http://localhost:4096/health
+# {"ok":true}
 ```
 
-For options and workflows, see:
+## Endpoints overview
 
-- [Complete CLI Guide](/packages/0x0/complete-guide)
+| Endpoint | Method | Purpose |
+| --- | --- | --- |
+| `/health` | GET | Health check |
+| `/completion` | POST | Stream code completion |
+| `/completion/text` | POST | Stream text generation |
+| `/completion/accept` | POST | Report accepted completion |
+| `/completion/reject` | POST | Report rejected completion |
+| `/completion/memory/stats` | GET | Memory statistics |
+| `/completion/memory` | DELETE | Clear memory |
+| `/completion/conventions` | POST | Analyze project conventions |
+| `/completion/conventions` | DELETE | Invalidate convention cache |
+
+See [Completion API](/packages/0x0/completion-api) for full request/response schemas.
+
+## See also
+
+- [CLI Reference](/packages/0x0/cli-reference) -- all commands and flags
+- [Network](/packages/0x0/network) -- port, hostname, CORS options

@@ -1,55 +1,49 @@
 ---
 title: '0x0'
-description: 'An open-source AI coding agent with a server-client architecture -- TUI, IDE extensions, Neovim, and standalone clients'
+description: 'AI-powered code completion server that learns your project patterns'
 ---
 
-Welcome to the 0x0 docs.
+0x0 is a lightweight HTTP server that provides two features:
 
-0x0 is an open-source AI coding agent built around a **server-client architecture**, inspired by
-[opencode](https://github.com/anomalyco/opencode). The core is an HTTP server that handles LLM
-providers, tool execution, sessions, and permissions. Clients connect to it over HTTP and SSE -- the
-TUI, VSCode/Cursor extension, Neovim plugin, and standalone tools like the git commit client are all
-clients of the same server.
+1. **Inline code completions** -- context-aware, project-aware suggestions that get better the more you use them
+2. **Git commit messages** -- generate conventional commit messages from staged diffs
 
-This architecture means you can build your own clients on top of the server, and all clients share
-the same configuration, agents, and provider credentials.
+It supports Claude (via the `claude` CLI) and OpenAI models (via `OPENAI_API_KEY`), runs on any machine with Bun, and compiles to a single self-contained binary.
 
-Unlike opencode, 0x0 is fully compliant with and respects the terms of use of all supported
-providers -- including Anthropic (Claude Code), OpenAI (Codex), and others. You can use it without
-risk of getting your accounts banned.
+## What makes it different
 
-## Get started
+Most completion tools treat every request in isolation. 0x0 builds **three layers of context** for every completion:
 
-- [Complete CLI Guide](/packages/0x0/complete-guide) -- installation, commands, and
-  configuration
-- [TUI Workflow](/packages/0x0/tui-workflow) -- interactive terminal UI usage patterns
+- **Project conventions** -- scans your codebase once and detects formatting (semicolons, quotes, indentation), naming (camelCase, snake_case), import style, error handling patterns, and structural patterns (namespaces, async/await preference, export style). Cached per project.
+- **File-level context** -- resolves imports from the current file, reads sibling files for patterns, greps for referenced type/interface definitions. Gathered per request.
+- **Learned preferences** -- tracks which completions you accept and reject per project, automatically extracts recurring patterns into rules. The more you use it, the better it gets.
 
-## Concepts
+## Quick start
 
-- [Agents](/packages/0x0/agents) -- built-in and custom AI agent profiles
-- [Permissions](/packages/0x0/permissions) -- rule-based tool access control
-- [Tools](/packages/0x0/tools) -- built-in tools available to agents
+```bash
+# Install
+bun install -g @anonymous-dev/0x0
 
-## Guides
+# Start the server (default port 4096)
+0x0
 
-- [Commands](/packages/0x0/commands) -- reusable slash commands for the TUI
-- [Config Strategy](/packages/0x0/config-strategy) -- global vs. project config architecture
-- [Keybinds](/packages/0x0/keybinds) -- customize keyboard shortcuts
-- [MCP Servers](/packages/0x0/mcp-servers) -- configure local and remote MCP servers
-- [Network](/packages/0x0/network) -- hostname, port, mDNS, and CORS options
-- [Plugins](/packages/0x0/plugins) -- extend 0x0 with custom hooks and tools
-- [Skills](/packages/0x0/skills) -- portable instruction packs
-- [Providers](/packages/0x0/providers) -- configure LLM providers and models
+# Or run from source
+bun run src/index.ts
+```
 
-## Clients
+The server exposes a simple HTTP API. Your editor plugin sends `POST /completion` requests and receives streamed suggestions.
 
-- [Neovim](/packages/0x0/neovim) -- TUI terminal and editor context bridge
-- [Neovim Completion](/packages/0x0/neovim-completion) -- inline ghost text suggestions (Copilot-style)
-- [Git Commit Client](/packages/0x0/git) -- AI-powered commit message generation
+## Requirements
 
-## Reference
+At least one LLM provider:
 
-- [CLI Reference](/packages/0x0/cli-reference) -- commands and flags index
-- [Environment Variables](/packages/0x0/environment-variables) -- all `ZEROXZERO_*` env vars
-- [Server](/packages/0x0/server) -- headless HTTP server mode
-- [ACP](/packages/0x0/acp) -- Agent Client Protocol for IDE integration
+- **Claude** -- install the [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) (`claude` binary on PATH)
+- **OpenAI** -- set `OPENAI_API_KEY` environment variable
+
+## Next steps
+
+- [Server](/packages/0x0/server) -- configuration and running
+- [Completion API](/packages/0x0/completion-api) -- full API reference
+- [Memory System](/packages/0x0/memory) -- how the learning works
+- [Neovim Completion](/packages/0x0/neovim-completion) -- editor integration
+- [Git Commit](/packages/0x0/git) -- commit message generation

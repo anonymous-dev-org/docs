@@ -1,106 +1,62 @@
 ---
 title: 'Providers'
-description: 'Configure LLM providers, models, and API settings'
+description: 'Supported LLM providers and models'
 icon: 'cloud'
 ---
 
-0x0 delegates LLM inference to external provider SDKs. Each provider requires a corresponding CLI
-binary on your `PATH` for authentication and availability detection, but actual inference runs
-through the provider's SDK (Claude Agent SDK for Claude Code, JSON-RPC app server for Codex).
+0x0 supports two LLM providers for completions and text generation.
 
-## Built-in providers
+## Claude
 
-| Provider | ID | CLI binary | Models |
+Uses the `claude` CLI binary to stream completions. No API key management needed -- authentication is handled by the Claude CLI itself.
+
+**Detection:** `claude` binary on `PATH`.
+
+| Model | Context | Output | Notes |
 | --- | --- | --- | --- |
-| Claude Code | `claude-code` | `claude` | `claude-sonnet-4-6` (200K context, 64K output), `claude-opus-4-6` (200K context, 32K output), `claude-haiku-4-5-20251001` (200K context, 8K output) |
-| Codex | `codex` | `codex` | `gpt-5-codex` (400K context: 272K input, 128K output; reasoning), `o3` (200K context, 32K output; reasoning), `o4-mini` (200K context, 32K output; reasoning) |
+| `claude-haiku-4-5-20251001` | 200K | 8K | Default for completions (fast) |
+| `claude-sonnet-4-6` | 200K | 64K | Higher quality |
+| `claude-opus-4-6` | 200K | 32K | Highest quality |
 
-Only providers whose CLI binary is found on `PATH` appear in `0x0 models` and the model picker.
+## Codex (OpenAI)
 
-Additional providers (Copilot, GitLab, Antigravity) can be made available through
-[plugins](/packages/0x0/plugins) that register `auth` hooks.
+Uses the OpenAI API directly via `OPENAI_API_KEY`. No SDK dependency -- just HTTP requests.
 
-## Provider config
+**Detection:** `OPENAI_API_KEY` environment variable is set.
 
-Configure providers in `config.yaml` under the `provider` key:
-
-```yaml
-provider:
-  claude-code:
-    options:
-      timeout: 300000
-    models:
-      claude-sonnet-4-6:
-        variants:
-          low: {}
-          medium: {}
-          high: {}
-```
-
-### Provider options
-
-| Field | Type | Default | Description |
+| Model | Context | Output | Notes |
 | --- | --- | --- | --- |
-| `apiKey` | `string` | -- | API key (supports `{env:VAR}` interpolation) |
-| `baseURL` | `string` | -- | Base URL override for API requests |
-| `enterpriseUrl` | `string` | -- | GitHub Enterprise URL (Copilot provider only) |
-| `timeout` | `number \| false` | `300000` | Request timeout in ms, or `false` to disable |
+| `o4-mini` | 200K | 32K | Default for completions (fast, reasoning) |
+| `o3` | 200K | 32K | Reasoning |
+| `gpt-5-codex` | 400K | 128K | Large context |
 
-### Model configuration
+## Provider selection
 
-- `models`: per-model configuration including `variants` (reasoning effort levels, can be disabled with `disabled: true`)
+The server auto-detects available providers. When both are available, Claude is preferred.
 
-## Provider config files
+You can override per-request:
 
-Provider-specific config can be stored in separate files:
-
-- **Global**: `~/.config/0x0/providers/<provider-id>.yaml`
-- **Project**: `.0x0/providers/<provider-id>.yaml`
-
-The filename (without `.yaml`) becomes the provider ID. These files use the same schema as the
-`provider.<id>` config section and are merged at the appropriate precedence level.
-
-## Setting the default model
-
-```yaml
-model: claude-code/claude-sonnet-4-6
+```json
+{
+  "prefix": "...",
+  "suffix": "...",
+  "provider": "codex",
+  "model": "o4-mini"
+}
 ```
 
-The format is `provider-id/model-id`. This can be overridden per-agent or via the `--model` CLI
-flag.
+Or set a default in config:
 
-A separate `small_model` field sets the model used for lightweight tasks like title generation.
-The small model is auto-detected from the active provider (prefers haiku/mini/nano variants):
-
-```yaml
-small_model: claude-code/claude-haiku-4-5-20251001
-```
-
-## Model selection priority
-
-1. `--model` CLI flag
-2. Agent-level `model` setting
-3. `model` in config
-4. Default: `claude-code/claude-sonnet-4-6` (if `claude` binary is on PATH)
-
-Models are sorted by preference: sonnet > gpt-5-codex > opus > o3 > o4-mini > haiku.
-
-## Listing models
-
-```bash
-# List all available models
-0x0 models
-
-# Filter by provider
-0x0 models claude-code
-
-# Verbose output with costs and metadata
-0x0 models --verbose
+```json
+{
+  "completion": {
+    "default_provider": "codex",
+    "default_model": "o4-mini"
+  }
+}
 ```
 
 ## See also
 
-- [Plugins](/packages/0x0/plugins) -- extend with additional provider auth
-- [CLI Reference](/packages/0x0/cli-reference)
-- [Environment Variables](/packages/0x0/environment-variables)
-- [Complete CLI Guide](/packages/0x0/complete-guide)
+- [Completion API](/packages/0x0/completion-api) -- `provider` and `model` fields
+- [Server](/packages/0x0/server) -- configuration file location
