@@ -1,0 +1,59 @@
+---
+title: 'Brew'
+description: 'Homebrew taps, formulas, and casks managed via Brewfile'
+---
+
+The `brew/` module manages all Homebrew dependencies through a single
+[Brewfile](https://github.com/Homebrew/homebrew-bundle).
+
+## Installation
+
+```bash
+./brew/install-brew.sh
+```
+
+This script:
+1. Installs Homebrew if it's not already present.
+2. Runs `brew bundle` against the Brewfile to install everything.
+
+## Taps
+
+| Tap | Provides |
+|---|---|
+| `nikitabobko/tap` | AeroSpace window manager |
+| `oven-sh/bun` | Bun JavaScript runtime |
+
+## Formulas (CLI Tools)
+
+| Formula | Description |
+|---|---|
+| `biome` | Linter and formatter for web languages |
+| `gh` | GitHub CLI |
+| `git-delta` | Better git diff viewer |
+| `luarocks` | Lua package manager |
+| `markdownlint-cli` | Markdown linter |
+| `mkcert` | Local HTTPS certificate generator |
+| `neovim` | Text editor |
+| `nmap` | Network scanner |
+| `nvm` | Node.js version manager |
+| `ripgrep` | Fast recursive text search |
+| `stow` | Dotfile symlink manager |
+| `tree-sitter` | Incremental parser generator |
+| `tree-sitter-cli` | Tree-sitter CLI tools |
+| `xh` | Modern HTTP client (curl alternative) |
+| `bun` | JavaScript runtime and package manager |
+
+## Casks (GUI Apps)
+
+| Cask | Description |
+|---|---|
+| `aerospace` | Tiling window manager |
+| `betterdisplay` | Display management and resolution control |
+| `claude` | Claude desktop app |
+| `claude-code` | Claude Code CLI |
+| `codex` | OpenAI Codex CLI |
+| `http-toolkit` | HTTP debugging proxy |
+| `kitty` | GPU-accelerated terminal emulator |
+| `ngrok` | Tunneling and ingress service |
+| `notion-calendar` | Calendar app |
+| `orbstack` | Docker and Kubernetes desktop runtime |

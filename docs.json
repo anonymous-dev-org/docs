@@ -19,32 +19,28 @@
         ]
       },
       {
-        "tab": "0x0",
+        "tab": "Rig",
         "groups": [
           {
             "group": "Getting Started",
-            "pages": ["packages/0x0/index", "packages/0x0/server"]
+            "pages": ["packages/rig/index", "packages/rig/installation"]
           },
           {
-            "group": "Features",
+            "group": "Modules",
             "pages": [
-              "packages/0x0/completion-api",
-              "packages/0x0/memory",
-              "packages/0x0/providers",
-              "packages/0x0/git"
-            ]
-          },
-          {
-            "group": "Clients",
-            "pages": [
-              "packages/0x0/neovim-completion"
+              "packages/rig/aerospace",
+              "packages/rig/neovim",
+              "packages/rig/kitty",
+              "packages/rig/zsh",
+              "packages/rig/git",
+              "packages/rig/brew",
+              "packages/rig/macos"
             ]
           },
           {
             "group": "Reference",
             "pages": [
-              "packages/0x0/cli-reference",
-              "packages/0x0/network"
+              "packages/rig/keybindings"
             ]
           }
         ]

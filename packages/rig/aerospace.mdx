@@ -1,0 +1,132 @@
+---
+title: 'Aerospace'
+description: 'Tiling window manager with a 9x9 workspace grid and SwiftUI picker apps'
+---
+
+[AeroSpace](https://github.com/nikitabobko/AeroSpace) is a tiling window manager for macOS.
+Rig configures it with a **9x9 workspace grid** — 9 workspace rows, each with 9 desktops.
+
+## Workspace Model
+
+Workspaces are named `W.D` where `W` is the row (1-9) and `D` is the desktop (1-9), giving
+81 total workspaces (e.g. `1.1`, `3.5`, `7.2`).
+
+- Starts on workspace `1.1` after login.
+- Each workspace row remembers its last active desktop.
+- No gaps between windows (inner/outer = 0).
+
+## Keybindings
+
+### Window Navigation
+
+| Shortcut | Action |
+|---|---|
+| `Alt + h/j/k/l` | Focus left / down / up / right |
+| `Alt + Shift + h/j/k/l` | Move window left / down / up / right |
+
+### Workspace Navigation
+
+| Shortcut | Action |
+|---|---|
+| `Cmd + Alt + 1-9` | Switch to workspace row 1-9 (remembers last desktop) |
+| `Cmd + Alt + j/k` | Next / previous workspace row |
+| `Cmd + Alt + h/l` | Switch desktop within workspace (wraps) |
+
+### Move Windows Between Workspaces
+
+| Shortcut | Action |
+|---|---|
+| `Cmd + Alt + Shift + 1-9` | Send window to workspace row (stay in place) |
+| `Cmd + Alt + Shift + j/k` | Send window to next/prev workspace row |
+| `Cmd + Alt + Shift + h/l` | Send window to next/prev desktop (wraps) |
+
+### Layout & Resize
+
+| Shortcut | Action |
+|---|---|
+| `Alt + /` | Cycle tiles / horizontal / vertical |
+| `Alt + ,` | Cycle accordion horizontal / vertical |
+| `Alt + f` | Toggle fullscreen |
+| `Alt + Tab` | Focus back-and-forth |
+| `Alt + v` | Join with right |
+| `Alt + b` | Join with down |
+| `Alt + r` | Enter **resize mode** (`h/j/k/l` to resize, `Esc`/`Enter` to exit) |
+
+### Workspace Management
+
+| Shortcut | Action |
+|---|---|
+| `Alt + n` | Create a new unused workspace |
+| `Alt + p` | Open workspace picker (SwiftUI app) |
+| `Alt + i` | Open notification picker (SwiftUI app) |
+
+### App Launchers
+
+| Shortcut | Action |
+|---|---|
+| `Alt + Shift + t` | Launch Kitty terminal |
+| `Alt + Shift + s` | Launch Safari |
+| `Alt + Shift + f` | Launch Finder |
+
+## Configuration Details
+
+```toml
+start-at-login = true
+enable-normalization-flatten-containers = true
+enable-normalization-opposite-orientation-for-nested-containers = true
+on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
+
+[gaps]
+inner.horizontal = 0
+inner.vertical = 0
+outer.left = 0
+outer.right = 0
+outer.top = 0
+outer.bottom = 0
+```
+
+## Swift Picker Apps
+
+Rig includes two custom SwiftUI apps compiled during `init.sh`:
+
+### WorkspacePicker
+
+A visual 9x9 grid overlay showing:
+- Currently occupied desktops
+- Windows and apps on each desktop
+- Notification badges
+- Preset workspace layouts (persisted as JSON)
+
+Launch with `Alt + p`. Supports a `--goto` flag for direct workspace navigation.
+
+### NotificationPicker
+
+Lists all applications with active notification badges. Click an entry to jump to
+the app's workspace and window.
+
+Launch with `Alt + i`.
+
+### Compiling manually
+
+```bash
+cd ~/.config/aerospace/scripts
+for src in *.swift; do
+  name=$(basename "$src" .swift)
+  bin=$(echo "$name" | sed 's/\([a-z]\)\([A-Z]\)/\1-\2/g' | tr '[:upper:]' '[:lower:]')-app
+  swiftc -O -o "$bin" "$src" -framework SwiftUI -framework AppKit
+done
+```
+
+## Helper Scripts
+
+All scripts live in `~/.config/aerospace/scripts/`:
+
+| Script | Purpose |
+|---|---|
+| `switch-workspace.sh` | Switch workspace row, remember last desktop |
+| `move-to-workspace.sh` | Move window to workspace row (stay in place) |
+| `switch-desktop.sh` | Navigate desktops within workspace (circular) |
+| `move-to-desktop.sh` | Move window between desktops (circular) |
+| `new-workspace.sh` | Find first unused workspace row |
+| `workspace-picker.sh` | Launch WorkspacePicker app |
+| `notification-picker.sh` | Launch NotificationPicker app |

@@ -1,0 +1,65 @@
+---
+title: 'Kitty'
+description: 'Terminal emulator with warm dark Ghosty theme and tab navigation'
+---
+
+[Kitty](https://sw.kovidgoyal.net/kitty/) is a fast, GPU-accelerated terminal emulator.
+Rig configures it with a minimal warm dark theme and keyboard-driven tab navigation.
+
+## Theme
+
+The color scheme is loaded from a separate `ghosty.conf` file — a warm, muted dark palette:
+
+| Element | Color |
+|---|---|
+| Background | `#1c1b1a` |
+| Foreground | `#c8c2b8` |
+| Cursor | `#b5b0a8` (block style) |
+
+The palette uses warm desaturated tones — rose, sage green, gold, steel blue, lavender, and teal.
+
+## UI Settings
+
+| Setting | Value |
+|---|---|
+| Font size | 13.5pt |
+| Audio bell | Enabled (macOS Blow sound) |
+| Remote control | Socket only (`unix:/tmp/kitty-{kitty_pid}`) |
+| Tab bar position | Top |
+| Tab bar style | Separator (space-separated) |
+| Tab title max length | 20 characters |
+| Tab bar min tabs | 1 (always visible) |
+
+### Tab colors
+
+| State | Foreground | Background |
+|---|---|---|
+| Active | `#e0dbd2` | `#3a3835` |
+| Inactive | `#807a72` | `#252422` |
+| Bar background | `#1c1b1a` | |
+
+## Tab Navigation
+
+| Shortcut | Action |
+|---|---|
+| `Ctrl + Alt + h` | Previous tab |
+| `Ctrl + Alt + l` | Next tab |
+| `Ctrl + Alt + 1-9` | Go to tab 1-9 |
+| `Ctrl + Alt + Shift + h` | Move tab backward |
+| `Ctrl + Alt + Shift + l` | Move tab forward |
+
+## Window & Tab Creation
+
+| Shortcut | Action |
+|---|---|
+| `Cmd + t` / `kitty_mod + t` | New tab (current directory) |
+| `Cmd + n` / `kitty_mod + n` | New OS window (current directory) |
+
+New tabs and windows inherit the working directory of the current tab.
+
+## Disabled Defaults
+
+Several default Kitty bindings are disabled (`no_op`) to avoid conflicts with other tools:
+
+`kitty_mod+enter`, `cmd+enter`, `kitty_mod+]`, `kitty_mod+[`, `kitty_mod+f`,
+`kitty_mod+b`, `kitty_mod+backtick`, `kitty_mod+r`

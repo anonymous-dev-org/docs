@@ -1,0 +1,126 @@
+---
+title: 'Neovim'
+description: '"MiniMax" editor configuration built on mini.nvim'
+---
+
+The Neovim configuration is called **MiniMax** — a feature-rich setup built almost entirely
+on the [mini.nvim](https://github.com/nvim-mini/mini.nvim) library, with select external
+plugins for language support, Git, and debugging.
+
+## Architecture
+
+Config files load in numbered order during startup:
+
+```
+~/.config/nvim/
+  init.lua             # Bootstrap mini.nvim + MiniDeps
+  plugin/
+    10_options.lua     # Built-in Neovim behavior
+    20_keymaps.lua     # Custom mappings
+    30_mini.lua        # Mini module configuration
+    40_plugins.lua     # External plugins
+  after/
+    ftplugin/          # Filetype-specific overrides
+    lsp/               # Language server configurations
+    snippets/          # Higher priority snippet files
+  lua/
+    claude-queue/      # Custom Claude Code integration module
+  snippets/            # User-defined snippets
+```
+
+## Key Options
+
+| Option | Value |
+|---|---|
+| Leader key | `Space` |
+| Indent | 2 spaces (expandtab) |
+| Text width | 100 columns (adapts to window) |
+| Line numbers | Relative |
+| Current line | Highlighted |
+| Undo | Persistent across sessions |
+| Fold method | Indent-based |
+| Search | Incremental, smart case |
+| Mouse | Enabled |
+| Diagnostics | Signs for warnings+, virtual text for errors on current line |
+
+## Leader Key Groups
+
+All leader mappings follow a two-key pattern: `<Space>` + group key + action key.
+
+| Prefix | Group | Examples |
+|---|---|---|
+| `<Leader>a` | AI | `ac` toggle Claude, `af` focus Claude, `ar` resume |
+| `<Leader>b` | Buffer | `bs` scratch, `ba` alternate, `bw` wipeout |
+| `<Leader>d` | Debug | `db` breakpoint, `dc` continue, `di` step into |
+| `<Leader>e` | Explore/Edit | `ed` directory, `ef` file dir, `ei` init.lua |
+| `<Leader>f` | Find | `ff` files, `fg` grep live, `fh` help tags |
+| `<Leader>g` | Git | `gg` Neogit, `gd` diffview, `gc` commit |
+| `<Leader>l` | Language | `la` actions, `lr` rename, `ls` definition |
+| `<Leader>m` | Map | Keymap exploration |
+| `<Leader>o` | Octo | GitHub PR/issue integration |
+| `<Leader>r` | Request | HTTP client (Hurl) |
+| `<Leader>s` | Session | `sn` new, `sr` read, `sd` delete |
+| `<Leader>t` | Terminal | Terminal management |
+| `<Leader>v` | Visits | Visited paths history |
+| `<Leader>D` | Database | Dadbod UI |
+
+## General Mappings
+
+| Shortcut | Action |
+|---|---|
+| `[p` / `]p` | Paste above / below current line |
+| `Ctrl+d` / `Ctrl+u` | Half page down / up (centered) |
+| `n` / `N` | Next / prev search result (centered) |
+| `Ctrl+w z` | Zoom toggle |
+| `Ctrl+w r` | Resize to default width |
+| `Esc Esc` | Terminal normal mode |
+| `Ctrl+h/j/k/l` | Navigate between windows |
+| `Alt+h/j/k/l` | Navigate in Insert/Command mode |
+
+## Color Scheme
+
+Uses [Zenbones](https://github.com/zenbones-theme/zenbones.nvim) with:
+- Stark darkness setting
+- Transparent background
+- Italic comments
+- Custom desaturated palette (subtle leaf, sky, blossom, rose, water tones)
+- Dark neutral backgrounds (`#121212` base)
+
+## Plugin Manager
+
+[MiniDeps](https://github.com/nvim-mini/mini.nvim/blob/main/readmes/mini-deps.md) manages all
+plugins. Two-stage loading is used for startup performance:
+
+- `now()` — loads immediately (icons, notifications, statusline, color scheme)
+- `later()` — deferred until after first screen draw (Git, debugging, formatting, AI tools)
+- `now_if_args()` — loads immediately only when opening a file (`nvim -- file`)
+
+## External Plugins
+
+Beyond `mini.nvim`, the config includes:
+
+| Plugin | Purpose |
+|---|---|
+| `zenbones.nvim` + `lush.nvim` | Color scheme |
+| `nvim-treesitter` | Syntax highlighting and textobjects |
+| `nvim-lspconfig` + `mason.nvim` | Language server management |
+| `conform.nvim` | Format on save (Stylua, Biome, Ruff) |
+| `neogit` + `gitsigns` + `diffview` | Git interface |
+| `octo.nvim` | GitHub PRs and issues |
+| `hurl.nvim` | HTTP client |
+| `nvim-dap` + `nvim-dap-ui` | Debugging (JS, Go) |
+| `claudecode.nvim` | Claude Code integration |
+| `vim-dadbod` + `vim-dadbod-ui` | Database client |
+
+## LSP Servers
+
+Configured and auto-installed via Mason:
+
+| Server | Languages |
+|---|---|
+| `ts_ls` | TypeScript / JavaScript (skipped in Deno projects) |
+| `denols` | Deno |
+| `lua_ls` | Lua (disabled by default, enable via `<Leader>lm`) |
+| `astro` | Astro |
+| `biome` | JS/TS/JSON/CSS/HTML linting |
+| `yamlls` | YAML |

@@ -1,0 +1,107 @@
+---
+title: 'Zsh'
+description: 'Shell with live autocomplete, syntax highlighting, and lazy-loaded runtimes'
+---
+
+The Zsh configuration provides a fast, minimal shell with live autocomplete, syntax
+highlighting, and lazy-loaded language runtimes.
+
+## Plugins
+
+Two plugins are auto-cloned on first shell start:
+
+| Plugin | Purpose |
+|---|---|
+| [zsh-autocomplete](https://github.com/marlonrichert/zsh-autocomplete) | Live dropdown completion as you type |
+| [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting) | Real-time command coloring |
+
+Update plugins with the `zsh_plugins_update` function.
+
+If `zsh-autocomplete` is missing, the config falls back to native `compinit`.
+
+## History
+
+| Setting | Value |
+|---|---|
+| History file | `~/.zsh_history` |
+| Size | 20,000 entries |
+| Dedup | Ignore all duplicates |
+| Sharing | Shared across sessions, appended incrementally |
+| Format | Extended (with timestamps) |
+
+## Completion
+
+- Sources completions from Homebrew's `site-functions` directory.
+- Async autocomplete with 50ms delay and 1 character minimum input.
+- Menu select mode with case-insensitive matching.
+- Cache stored at `~/.zsh/cache`.
+
+### Keybindings
+
+| Key | Action |
+|---|---|
+| `Tab` | Accept inline completion |
+| `Up / Down` | Navigate menu or search history |
+
+## Syntax Highlighting Colors
+
+| Token | Style |
+|---|---|
+| Commands, aliases, builtins, functions | Green bold |
+| Unknown tokens | Red bold |
+| Paths, quotes, options, globbing | Unstyled (none) |
+
+## Prompt
+
+```
+~/.config/nvim %              # left: directory + green prompt char
+                          1   # right: last exit code in red (if non-zero)
+```
+
+- Cursor: solid block
+- Prompt character: `%` for regular user, `#` for root
+
+## Aliases
+
+| Alias | Expands to |
+|---|---|
+| `b` | `bun` |
+| `bb` | `bun run` |
+| `ai` | `claude` |
+| `supa` | `supabase` |
+| `n` | `nvim` |
+| `nt` | `nvim +term` |
+
+## Lazy-Loaded Runtimes
+
+Language runtimes are lazy-loaded on first use to keep shell startup fast.
+
+### NVM (Node.js)
+
+`nvm`, `node`, `npm`, and `npx` are all shell functions that trigger a one-time load of NVM
+from Homebrew's install path. After the first call, the real binaries take over.
+
+### GoEnv (Go)
+
+`goenv`, `go`, and `gofmt` work the same way — the first invocation loads GoEnv from
+`~/.goenv` and adds shims to `PATH`.
+
+### PostgreSQL
+
+The `libpq` client binaries are added to `PATH` directly (not lazy-loaded):
+
+```bash
+export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+```
+
+## Shell Options
+
+```bash
+setopt hist_ignore_all_dups share_history inc_append_history extended_history
+setopt autocd nocaseglob interactivecomments no_beep prompt_subst
+```
+
+## Local Overrides
+
+Machine-specific settings can go in `~/.zshrc.local` — it's sourced at the end of `.zshrc`
+if it exists. This file is not tracked in git.

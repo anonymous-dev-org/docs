@@ -1,0 +1,137 @@
+---
+title: 'Keybindings'
+description: 'Unified keybinding reference across Aerospace, Neovim, Kitty, and Zsh'
+---
+
+A combined reference of all keybindings configured by Rig across every module.
+
+## Aerospace — Window Management
+
+### Window Focus & Move
+
+| Shortcut | Action |
+|---|---|
+| `Alt + h/j/k/l` | Focus left / down / up / right |
+| `Alt + Shift + h/j/k/l` | Move window left / down / up / right |
+| `Alt + Tab` | Focus back-and-forth |
+
+### Workspace Navigation
+
+| Shortcut | Action |
+|---|---|
+| `Cmd + Alt + 1-9` | Switch to workspace row (remembers desktop) |
+| `Cmd + Alt + j/k` | Next / previous workspace row |
+| `Cmd + Alt + h/l` | Switch desktop within workspace (wraps) |
+
+### Move Windows Between Workspaces
+
+| Shortcut | Action |
+|---|---|
+| `Cmd + Alt + Shift + 1-9` | Send window to workspace row |
+| `Cmd + Alt + Shift + j/k` | Send to next/prev workspace row |
+| `Cmd + Alt + Shift + h/l` | Send to next/prev desktop |
+
+### Layout & Resize
+
+| Shortcut | Action |
+|---|---|
+| `Alt + /` | Cycle tiles / horizontal / vertical |
+| `Alt + ,` | Cycle accordion horizontal / vertical |
+| `Alt + f` | Toggle fullscreen |
+| `Alt + v` / `Alt + b` | Join with right / down |
+| `Alt + r` | Enter resize mode |
+
+### Resize Mode
+
+| Key | Action |
+|---|---|
+| `h/j/k/l` | Resize width/height by 50px |
+| `Esc` / `Enter` | Exit resize mode |
+
+### Workspace Management
+
+| Shortcut | Action |
+|---|---|
+| `Alt + n` | New unused workspace |
+| `Alt + p` | Workspace picker |
+| `Alt + i` | Notification picker |
+
+### App Launchers
+
+| Shortcut | Action |
+|---|---|
+| `Alt + Shift + t` | Kitty terminal |
+| `Alt + Shift + s` | Safari |
+| `Alt + Shift + f` | Finder |
+
+---
+
+## Kitty — Terminal
+
+### Tab Navigation
+
+| Shortcut | Action |
+|---|---|
+| `Ctrl + Alt + h/l` | Previous / next tab |
+| `Ctrl + Alt + 1-9` | Go to tab 1-9 |
+| `Ctrl + Alt + Shift + h/l` | Move tab backward / forward |
+
+### Tabs & Windows
+
+| Shortcut | Action |
+|---|---|
+| `Cmd + t` | New tab (current directory) |
+| `Cmd + n` | New OS window (current directory) |
+
+---
+
+## Neovim — Editor
+
+### General
+
+| Shortcut | Action |
+|---|---|
+| `[p` / `]p` | Paste above / below |
+| `Ctrl + d/u` | Half page down / up (centered) |
+| `n` / `N` | Next / prev search (centered) |
+| `Ctrl + w z` | Zoom toggle |
+| `Ctrl + w r` | Resize to default width |
+| `Esc Esc` | Terminal normal mode |
+| `Ctrl + h/j/k/l` | Navigate windows |
+| `Alt + h/j/k/l` | Navigate in Insert/Command mode |
+
+### Leader Groups (`Space` + ...)
+
+| Prefix | Group | Key highlights |
+|---|---|---|
+| `a` | AI | `c` Claude toggle, `f` focus, `r` resume, `s` send selection |
+| `b` | Buffer | `s` scratch, `a` alternate, `d` delete, `w` wipeout, `o` only |
+| `d` | Debug | `b` breakpoint, `c` continue, `i` step in, `o` step over |
+| `e` | Explore | `d` directory, `f` file dir, `i` init.lua, `q` quickfix |
+| `f` | Find | `f` files, `g` grep, `h` help, `b` buffers, `r` resume |
+| `g` | Git | `g` Neogit, `d` diffview, `c` commit, `p` push, `l` log |
+| `l` | Language | `a` actions, `r` rename, `s` definition, `d` diagnostics |
+| `o` | Octo | GitHub PR/issue operations |
+| `r` | Request | HTTP client (Hurl) |
+| `s` | Session | `n` new, `r` read, `d` delete |
+| `t` | Terminal | Terminal management |
+| `v` | Visits | `v` all paths, `V` cwd paths |
+| `D` | Database | Dadbod UI |
+
+### Toggle Options (`\` + ...)
+
+| Key | Toggles |
+|---|---|
+| `\h` | Search highlighting |
+| `\w` | Line wrap |
+| `\n` | Line numbers |
+| `\r` | Relative line numbers |
+
+---
+
+## Zsh — Shell
+
+| Key | Action |
+|---|---|
+| `Tab` | Accept inline completion |
+| `Up / Down` | Navigate completion menu or search history |

@@ -1,0 +1,57 @@
+---
+title: 'macOS'
+description: 'System defaults for Dock, Finder, keyboard, and appearance'
+---
+
+The `macos/defaults.sh` script applies non-default macOS system preferences. Run it once
+on a fresh Mac — some changes require a log out or restart to take effect.
+
+```bash
+./macos/defaults.sh
+```
+
+## Dock
+
+| Setting | Value |
+|---|---|
+| Auto-hide | Enabled |
+| Tile size | 58pt |
+| Magnification | Enabled, 68pt |
+| Minimize to application | Yes |
+| Show recent apps | No |
+| Rearrange Spaces by recent use | No |
+
+## Keyboard
+
+| Setting | Value |
+|---|---|
+| Auto-capitalization | Enabled |
+| Auto-period substitution | Enabled |
+
+## Finder
+
+| Setting | Value |
+|---|---|
+| Default view | Column view (`clmv`) |
+| Sort folders first | No |
+
+## Hot Corners
+
+| Corner | Action |
+|---|---|
+| Bottom-right | Quick Note |
+
+## Appearance
+
+| Setting | Value |
+|---|---|
+| System theme | Dark mode |
+
+## Post-Apply
+
+The script restarts the Dock and Finder after applying changes:
+
+```bash
+killall Dock
+killall Finder
+```

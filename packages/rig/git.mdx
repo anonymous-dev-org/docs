@@ -1,0 +1,26 @@
+---
+title: 'Git'
+description: 'Git editor and global ignore configuration'
+---
+
+Rig provides a minimal Git configuration focused on editor integration and global ignores.
+
+## Editor
+
+```ini
+[core]
+    editor = nvim
+```
+
+All Git operations that open an editor (commits, rebases, interactive adds) use Neovim.
+
+## Global Gitignore
+
+The global gitignore at `~/.config/git/ignore` excludes:
+
+```
+**/.claude/settings.local.json
+```
+
+This prevents machine-specific Claude Code settings from being accidentally committed
+to any repository.
