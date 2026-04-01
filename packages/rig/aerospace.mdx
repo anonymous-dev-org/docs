@@ -59,6 +59,7 @@ Workspaces are named `W.D` where `W` is the row (1-9) and `D` is the desktop (1-
 | `Alt + n` | Create a new unused workspace |
 | `Alt + p` | Open workspace picker (SwiftUI app) |
 | `Alt + i` | Open notification picker (SwiftUI app) |
+| `Alt + c` | Open clipboard history (SwiftUI app) |
 
 ### App Launchers
 
@@ -87,7 +88,7 @@ outer.bottom = 0
 
 ## Swift Picker Apps
 
-Rig includes two custom SwiftUI apps compiled during `init.sh`:
+Rig includes three custom SwiftUI apps compiled during `init.sh`:
 
 ### WorkspacePicker
 
@@ -109,6 +110,21 @@ to the current workspace and desktop. Click an entry to jump to the app's worksp
 and window.
 
 Launch with `Alt + i`.
+
+### ClipboardHistory
+
+A searchable clipboard history overlay powered by a background daemon (`ClipboardDaemon`).
+The daemon polls the system clipboard every second and persists entries to
+`~/.clipboard-history.json` (max 500 entries, 10k character cap per entry). Copies from
+sensitive apps (1Password, Keychain Access, LastPass, Bitwarden, KeePassXC) are excluded.
+
+The overlay shows recent clipboard entries with source app and relative timestamp:
+- `j/k` — navigate entries
+- `/` — enter search mode (filters by content or app name)
+- `Enter` — copy selected entry to clipboard
+- `Esc` — close (or exit search)
+
+Launch with `Alt + c`. The daemon is started via `clipboard-daemon.sh` (launched at login).
 
 ### Compiling manually
 
@@ -135,3 +151,5 @@ All scripts live in `~/.config/aerospace/scripts/`:
 | `workspace-picker.sh` | Launch WorkspacePicker app |
 | `notification-picker.sh` | Launch NotificationPicker app |
 | `minimap.sh` | Launch WorkspacePicker in goto mode |
+| `clipboard-daemon.sh` | Start background clipboard polling daemon |
+| `clipboard-history.sh` | Launch ClipboardHistory overlay |
