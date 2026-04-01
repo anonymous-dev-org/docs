@@ -49,14 +49,13 @@ All leader mappings follow a two-key pattern: `<Space>` + group key + action key
 
 | Prefix | Group | Examples |
 |---|---|---|
-| `<Leader>a` | AI | `ac` toggle Claude, `af` focus Claude, `ar` resume |
+| `<Leader>a` | AI | `ac` toggle, `af` focus, `ar` resume, `aC` continue, `am` model, `ab` add buffer, `as` send (visual), `aa` accept diff, `ad` deny diff |
 | `<Leader>b` | Buffer | `bs` scratch, `ba` alternate, `bw` wipeout |
 | `<Leader>d` | Debug | `db` breakpoint, `dc` continue, `di` step into |
 | `<Leader>e` | Explore/Edit | `ed` directory, `ef` file dir, `ei` init.lua |
 | `<Leader>f` | Find | `ff` files, `fg` grep live, `fh` help tags |
 | `<Leader>g` | Git | `gg` Neogit, `gd` diffview, `gc` commit |
 | `<Leader>l` | Language | `la` actions, `lr` rename, `ls` definition |
-| `<Leader>m` | Map | Keymap exploration |
 | `<Leader>o` | Octo | GitHub PR/issue integration |
 | `<Leader>r` | Request | HTTP client (Hurl) |
 | `<Leader>s` | Session | `sn` new, `sr` read, `sd` delete |
@@ -109,7 +108,9 @@ Beyond `mini.nvim`, the config includes:
 | `octo.nvim` | GitHub PRs and issues |
 | `hurl.nvim` | HTTP client |
 | `nvim-dap` + `nvim-dap-ui` | Debugging (JS, Go) |
+| `snacks.nvim` | UI framework (claudecode dependency) |
 | `claudecode.nvim` | Claude Code integration |
+| `0x0-completion.nvim` | Custom completion plugin |
 | `vim-dadbod` + `vim-dadbod-ui` | Database client |
 
 ## LSP Servers

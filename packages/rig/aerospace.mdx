@@ -101,8 +101,10 @@ Launch with `Alt + p`. Supports a `--goto` flag for direct workspace navigation.
 
 ### NotificationPicker
 
-Lists all applications with active notification badges. Click an entry to jump to
-the app's workspace and window.
+Queries the macOS Notification Center SQLite database to list applications with
+active notification badges. Supports a desktop-scoped view that filters notifications
+to the current workspace and desktop. Click an entry to jump to the app's workspace
+and window.
 
 Launch with `Alt + i`.
 
@@ -130,3 +132,4 @@ All scripts live in `~/.config/aerospace/scripts/`:
 | `new-workspace.sh` | Find first unused workspace row |
 | `workspace-picker.sh` | Launch WorkspacePicker app |
 | `notification-picker.sh` | Launch NotificationPicker app |
+| `minimap.sh` | Launch WorkspacePicker in goto mode |
