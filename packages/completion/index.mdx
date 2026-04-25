@@ -1,0 +1,68 @@
+---
+title: '0x0 Nvim Completion'
+description: 'Inline ghost-text completion for Neovim.'
+icon: 'text-cursor-input'
+---
+
+`@anonymous-dev/0x0-nvim-completion` is the inline completion plugin.
+
+It is separate from chat. It watches insert-mode context, sends prefix and suffix text to
+the 0x0 server, and renders the response as ghost text.
+
+## Setup
+
+Plugin module:
+
+```text
+zeroxzero-completion
+```
+
+Package name:
+
+```text
+@anonymous-dev/0x0-nvim-completion
+```
+
+```lua
+require("zeroxzero-completion").setup({
+  server_url = "http://localhost:4096",
+  provider = "codex",
+  model = "gpt-5.4-mini",
+})
+```
+
+## Defaults
+
+| Option | Default |
+|---|---|
+| `debounce_ms` | `150` |
+| `max_tokens` | `128` |
+| `temperature` | `0` |
+| `enabled` | `true` |
+| `keymaps.accept` | `<Tab>` |
+| `keymaps.accept_line` | `<C-e>` |
+| `keymaps.dismiss` | `<C-]>` |
+| `cache.enabled` | `true` |
+| `cache.max_entries` | `100` |
+
+## Excluded Filetypes
+
+The plugin does not request completions in noisy prompt or utility buffers by default:
+
+```lua
+{ "TelescopePrompt", "NvimTree", "help", "qf", "alpha", "dashboard" }
+```
+
+## API Surface
+
+The plugin uses `POST /completions` or the WebSocket `completion` message. The request
+contains:
+
+- `prefix`
+- `suffix`
+- `language`
+- `filepath`
+- Optional provider and model overrides
+
+Completion is intentionally narrow. It does not manage chat history, agent sessions, or
+review state.

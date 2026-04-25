@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Packages Docs",
+  "name": "anonymous.dev Docs",
   "colors": {
     "primary": "#2563EB",
     "light": "#60A5FA",
@@ -33,6 +33,7 @@
               "packages/rig/kitty",
               "packages/rig/zsh",
               "packages/rig/git",
+              "packages/rig/codex",
               "packages/rig/brew",
               "packages/rig/macos"
             ]
@@ -42,6 +43,31 @@
             "pages": [
               "packages/rig/keybindings"
             ]
+          }
+        ]
+      },
+      {
+        "tab": "0x0",
+        "groups": [
+          {
+            "group": "Components",
+            "pages": [
+              "packages/server/index",
+              "packages/nvim/index",
+              "packages/completion/index",
+              "packages/contracts/index"
+            ]
+          },
+          {
+            "group": "Server Guides",
+            "pages": [
+              "packages/server/configuration",
+              "packages/server/providers"
+            ]
+          },
+          {
+            "group": "API Reference",
+            "pages": ["packages/server/api-reference"]
           }
         ]
       },

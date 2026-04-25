@@ -1,11 +1,12 @@
 ---
 title: 'Neovim'
-description: '"MiniMax" editor configuration built on mini.nvim'
+description: 'Neovim config built around mini.nvim and a small set of focused plugins.'
 ---
 
-The Neovim configuration is called **MiniMax** — a feature-rich setup built almost entirely
-on the [mini.nvim](https://github.com/nvim-mini/mini.nvim) library, with select external
-plugins for language support, Git, and debugging.
+Rig ships the Neovim config under `neovim/.config/nvim`.
+
+It is built around `mini.nvim`. External plugins are used where they add clear value: language
+servers, formatting, Git, GitHub, debugging, HTTP requests, database browsing, and AI workflows.
 
 ## Architecture
 
@@ -23,8 +24,6 @@ Config files load in numbered order during startup:
     ftplugin/          # Filetype-specific overrides
     lsp/               # Language server configurations
     snippets/          # Higher priority snippet files
-  lua/
-    claude-queue/      # Custom Claude Code integration module
   snippets/            # User-defined snippets
 ```
 
@@ -40,16 +39,13 @@ Config files load in numbered order during startup:
 | Undo | Persistent across sessions |
 | Fold method | Indent-based |
 | Search | Incremental, smart case |
-| Mouse | Enabled |
-| Diagnostics | Signs for warnings+, virtual text for errors on current line |
-
 ## Leader Key Groups
 
-All leader mappings follow a two-key pattern: `<Space>` + group key + action key.
+Leader mappings use `<Space>` plus a group key and an action key.
 
 | Prefix | Group | Examples |
 |---|---|---|
-| `<Leader>a` | AI | `ac` toggle, `af` focus, `ar` resume, `aC` continue, `am` model, `ab` add buffer, `as` send (visual), `aa` accept diff, `ad` deny diff |
+| `<Leader>a` | AI | Chat, inline, model, buffer context, and review actions |
 | `<Leader>b` | Buffer | `bs` scratch, `ba` alternate, `bw` wipeout |
 | `<Leader>d` | Debug | `db` breakpoint, `dc` continue, `di` step into |
 | `<Leader>e` | Explore/Edit | `ed` directory, `ef` file dir, `ei` init.lua |
@@ -61,7 +57,6 @@ All leader mappings follow a two-key pattern: `<Space>` + group key + action key
 | `<Leader>s` | Session | `sn` new, `sr` read, `sd` delete |
 | `<Leader>t` | Terminal | Terminal management |
 | `<Leader>v` | Visits | Visited paths history |
-| `<Leader>D` | Database | Dadbod UI |
 
 ## General Mappings
 
@@ -88,10 +83,10 @@ Uses [Zenbones](https://github.com/zenbones-theme/zenbones.nvim) with:
 ## Plugin Manager
 
 [MiniDeps](https://github.com/nvim-mini/mini.nvim/blob/main/readmes/mini-deps.md) manages all
-plugins. Two-stage loading is used for startup performance:
+plugins. Loading is split for startup speed:
 
 - `now()` — loads immediately (icons, notifications, statusline, color scheme)
-- `later()` — deferred until after first screen draw (Git, debugging, formatting, AI tools)
+- `later()` — loads after first screen draw
 - `now_if_args()` — loads immediately only when opening a file (`nvim -- file`)
 
 ## External Plugins
@@ -108,9 +103,8 @@ Beyond `mini.nvim`, the config includes:
 | `octo.nvim` | GitHub PRs and issues |
 | `hurl.nvim` | HTTP client |
 | `nvim-dap` + `nvim-dap-ui` | Debugging (JS, Go) |
-| `snacks.nvim` | UI framework (claudecode dependency) |
-| `claudecode.nvim` | Claude Code integration |
-| `0x0-completion.nvim` | Custom completion plugin |
+| `codecompanion.nvim` | AI chat and inline editing |
+| `0x0-completion.nvim` | 0x0 ghost-text completion |
 | `vim-dadbod` + `vim-dadbod-ui` | Database client |
 
 ## LSP Servers

@@ -1,0 +1,61 @@
+---
+title: '0x0 Nvim Chat'
+description: 'Neovim chat, inline edits, and agent change review.'
+icon: 'square-terminal'
+---
+
+`@anonymous-dev/0x0-nvim-chat` is the editor chat client for the server.
+
+It connects to `/ws`, starts agent sessions, streams assistant output, runs inline edits,
+and reviews worktree changes before they touch the user's checkout.
+
+## Commands
+
+| Command | Purpose |
+|---|---|
+| `:ZeroChat` | Open the 0x0 chat buffer |
+| `:ZeroChatNew` | Start a new chat session |
+| `:ZeroChatOpen {id}` | Open an existing session |
+| `:ZeroChatSubmit` | Submit the current prompt |
+| `:ZeroInlineEdit` | Edit the selected range |
+| `:ZeroReview` | Open the change review view |
+| `:ZeroChangesStatus` | Refresh changed files |
+| `:ZeroAcceptAll` | Accept all agent changes |
+| `:ZeroDiscardAll` | Discard all agent changes |
+| `:ZeroAcceptFile {path}` | Accept one changed file |
+| `:ZeroDiscardFile {path}` | Discard one changed file |
+| `:ZeroCancel` | Cancel the active run |
+| `:ZeroClose` | Close the WebSocket connection |
+
+## Setup
+
+Plugin module:
+
+```text
+zeroxzero
+```
+
+Package name:
+
+```text
+@anonymous-dev/0x0-nvim-chat
+```
+
+```lua
+require("zeroxzero").setup({
+  server_url = "http://localhost:4096",
+  provider = "codex",
+  model = "gpt-5.4",
+})
+```
+
+## Flow
+
+1. The plugin opens a WebSocket connection to the local server.
+2. A chat session creates a detached agent worktree for the current repo.
+3. The agent runs in that worktree and streams text back into Neovim.
+4. The server checkpoints changed files.
+5. The review commands accept or discard those changes.
+
+The checkout stays under user control. Agent edits are staged in server-managed state until
+the user accepts them.

@@ -1,0 +1,41 @@
+---
+title: 'Configuration'
+description: 'Environment variables and local server state.'
+icon: 'gear'
+---
+
+## Environment Variables
+
+| Variable | Description |
+|---|---|---|
+| `PORT` | Server port. Defaults to `4096`. |
+| `OPENAI_API_KEY` | Enables the `codex` provider. |
+| `ANTHROPIC_API_KEY` | Enables the `claude` provider. |
+
+Providers can be listed even when they are not configured. A request fails if it targets a
+provider without the matching API key.
+
+## Server URL
+
+The server binds through Bun and prints its local URL on boot:
+
+```bash
+PORT=4107 bun run --cwd apps/server dev
+```
+
+## State
+
+Agent sessions use local git worktrees and refs. The default state root is:
+
+```text
+~/.local/state/0x0/
+```
+
+Each session stores:
+
+- A detached agent worktree
+- A baseline ref
+- An agent-head ref
+- A `sessions.json` registry
+
+Clients should treat this directory as server-owned state.

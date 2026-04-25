@@ -1,6 +1,6 @@
 ---
 title: 'Installation'
-description: 'Setup, maintenance, and how GNU Stow symlinking works'
+description: 'Set up, update, and manage Rig modules.'
 ---
 
 ## Initial Setup
@@ -12,26 +12,31 @@ git clone https://github.com/anonymous-dev-org/rig.git
 cd rig
 ```
 
-### 2. Run init.sh
+### 2. Run the installer
 
 ```bash
 ./init.sh
 ```
 
-The script runs through each step interactively:
+`init.sh` is interactive by default. It asks before each major step:
 
-1. **Homebrew** — Installs Homebrew (if missing) and all formulas/casks from the `Brewfile`.
-2. **Stow packages** — For each module (`neovim`, `zsh`, `aerospace`, `kitty`, `git`), removes
-   any conflicting non-symlink files in `~` and runs `stow --restow --no-folding`.
-3. **macOS defaults** — Applies system preferences (Dock, Finder, keyboard, appearance).
-4. **Swift picker apps** — Compiles the Aerospace WorkspacePicker and NotificationPicker SwiftUI
-   apps with optimizations.
+| Step | What happens |
+|---|---|
+| Homebrew | Runs `./brew/install-brew.sh` to install Homebrew and the Brewfile |
+| Stow packages | Installs `neovim`, `zsh`, `aerospace`, `kitty`, `git`, and `codex` when present |
+| macOS defaults | Applies Dock, Finder, keyboard, hot corner, and appearance settings |
+| Swift apps | Compiles AeroSpace picker apps when `swiftc` is available |
 
-Pass `--yes` to skip all confirmation prompts:
+Use `--yes` for a full non-interactive install:
 
 ```bash
 ./init.sh --yes
 ```
+
+<Warning>
+  During stow setup, `init.sh` removes conflicting non-symlink files at the destination path.
+  Back up local dotfiles before running it on a machine with existing config.
+</Warning>
 
 ## Updating
 
@@ -42,41 +47,46 @@ Pass `--yes` to skip all confirmation prompts:
 This script:
 
 1. Pulls the latest changes from the remote.
-2. Re-stows all packages (stow is idempotent — safe to re-run).
+2. Re-stows installed packages with `stow --no-folding -t ~ -R`.
 3. Cleans up stale files from previous versions.
-4. Recompiles all Swift picker apps.
+4. Recompiles AeroSpace Swift picker apps when possible.
 
-Packages that aren't stowed on the current machine are gracefully skipped.
+Packages that are not installed on the current machine are skipped.
 
 ## How Stow Works
 
-[GNU Stow](https://www.gnu.org/software/stow/) creates symlinks from a target directory (your
-home `~`) into the repository. Each module directory mirrors `~/`:
+Stow creates symlinks from your home directory into the repo. Each module mirrors `$HOME`.
 
 ```
-rig/zsh/.zshrc             --> symlinked to ~/.zshrc
-rig/neovim/.config/nvim/   --> symlinked to ~/.config/nvim/
-rig/kitty/.config/kitty/   --> symlinked to ~/.config/kitty/
+rig/zsh/.zshrc                   --> ~/.zshrc
+rig/neovim/.config/nvim/init.lua --> ~/.config/nvim/init.lua
+rig/kitty/.config/kitty/         --> ~/.config/kitty/
+rig/codex/.codex/config.toml     --> ~/.codex/config.toml
 ```
 
-The `--no-folding` flag ensures Stow creates individual file symlinks rather than symlinking
-entire directories. This prevents untracked files from leaking into the repo.
+Rig uses `--no-folding` so Stow creates file-level links instead of linking whole directories.
 
-### Stow commands reference
+## Manual Stow Commands
 
 | Command | What it does |
 |---|---|
 | `stow --restow --no-folding -t ~ <pkg>` | Install/refresh a package |
 | `stow -D -t ~ <pkg>` | Unlink a package |
 
-### Ignored files
+## Ignored Files
 
-The `.stow-local-ignore` file excludes `.DS_Store`, `.git`, `.gitignore`, and
-`.stow-local-ignore` from being symlinked.
+`.stow-local-ignore` prevents these repo files from being linked into `$HOME`:
+
+```text
+.DS_Store
+.git
+.gitignore
+.stow-local-ignore
+```
 
 ## Local Overrides
 
-Machine-specific configuration that shouldn't be tracked in git:
+Keep machine-specific settings outside the repo:
 
-- **Zsh**: Create `~/.zshrc.local` — sourced at the end of `.zshrc`.
-- **Claude Code**: `.claude/settings.local.json` is globally gitignored.
+- Zsh: create `~/.zshrc.local`; it is sourced at the end of `.zshrc`.
+- Claude Code: `.claude/settings.local.json` is ignored by the global Git ignore.

@@ -1,0 +1,66 @@
+---
+title: 'Providers'
+description: 'OpenAI and Anthropic provider configuration.'
+icon: 'plug'
+---
+
+The server has two provider IDs:
+
+- `codex`
+- `claude`
+
+Both providers implement the same `ChatProvider` interface: `stream`, `complete`, and
+optional `aiModel` access for tool-using agent turns.
+
+## Codex
+
+The `codex` provider uses the OpenAI AI SDK.
+
+| Setting | Value |
+|---|---|
+| Required key | `OPENAI_API_KEY` |
+| Default model | `gpt-5.4` |
+| Models | `gpt-5.4`, `gpt-5.4-mini`, `gpt-5.4-nano` |
+
+## Claude
+
+The `claude` provider uses the Anthropic AI SDK.
+
+| Setting | Value |
+|---|---|
+| Required key | `ANTHROPIC_API_KEY` |
+| Default model | `claude-sonnet-4-6` |
+| Models | `claude-sonnet-4-6`, `claude-opus-4-7`, `claude-haiku-4-5` |
+
+## Provider Info
+
+`GET /providers` returns the models and whether each provider is configured:
+
+```json
+{
+  "providers": [
+    {
+      "id": "codex",
+      "label": "Codex",
+      "defaultModel": "gpt-5.4",
+      "models": ["gpt-5.4", "gpt-5.4-mini", "gpt-5.4-nano"],
+      "configured": true
+    }
+  ]
+}
+```
+
+## Selection
+
+HTTP requests choose a provider in the request body.
+
+```json
+{
+  "provider": "codex",
+  "model": "gpt-5.4-mini",
+  "messages": [{ "role": "user", "content": "Explain this file." }]
+}
+```
+
+WebSocket sessions can choose `provider` and `model` during `session.create`. If omitted,
+the server picks the first available provider.

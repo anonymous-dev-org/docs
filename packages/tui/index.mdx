@@ -1,0 +1,46 @@
+---
+title: 'TUI'
+description: 'Terminal UI client for 0x0'
+---
+
+**0x0 TUI** — A terminal-based chat client for interacting with AI agents through the 0x0
+server. Built with Rust and Ratatui.
+
+## Features
+
+- **Streaming Chat**: Real-time responses with token counting
+- **Multi-Agent**: Create named agents with different providers/models
+- **Conversation History**: Auto-saved and persistent across sessions
+- **Provider Switching**: Switch between Claude and Codex on the fly
+- **Tool Visibility**: See tool invocations and results inline
+- **Command Palette**: Quick access to all actions via `Ctrl+P`
+
+## Quick Start
+
+```bash
+# Run the TUI (auto-starts the server if needed)
+0x0-tui
+```
+
+The TUI auto-discovers and starts the 0x0 server. If the server is already running, it
+connects to it.
+
+## Configuration
+
+| Variable | Description | Default |
+|---|---|---|
+| `ZEROXZERO_URL` | Server URL | `http://localhost:4096` |
+| `ZEROXZERO_TUI_RESTART_SERVER` | Allow restarting conflicting server | `0` |
+
+Conversations are saved to `~/.local/share/zeroxzero/conversations/`.
+
+## Documentation
+
+<CardGroup cols={2}>
+  <Card title="Keybindings" href="/packages/tui/keybindings" icon="keyboard">
+    Keyboard shortcuts and navigation
+  </Card>
+  <Card title="Multi-Agent" href="/packages/tui/agents" icon="users">
+    Creating and managing multiple agents
+  </Card>
+</CardGroup>

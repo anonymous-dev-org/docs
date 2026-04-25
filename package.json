@@ -1,7 +1,7 @@
 {
   "name": "docs",
   "version": "0.0.0",
-  "description": "Use the starter kit to get your docs deployed and ready to customize.",
+  "description": "Documentation for anonymous.dev packages.",
   "main": "index.js",
   "scripts": {
     "dev": "mint dev",

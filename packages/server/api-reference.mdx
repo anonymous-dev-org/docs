@@ -1,0 +1,186 @@
+---
+title: 'API Reference'
+description: 'HTTP endpoints, WebSocket messages, and stream events.'
+icon: 'book-open'
+---
+
+## HTTP
+
+### `GET /health`
+
+Returns server status.
+
+```json
+{ "ok": true }
+```
+
+### `GET /providers`
+
+Lists available providers and their capabilities.
+
+```json
+{
+  "providers": [
+    {
+      "id": "claude",
+      "label": "Claude",
+      "defaultModel": "claude-sonnet-4-6",
+      "models": ["claude-sonnet-4-6", "claude-opus-4-7", "claude-haiku-4-5"],
+      "configured": true
+    }
+  ]
+}
+```
+
+### `POST /chat`
+
+Send chat messages to a provider. Streams SSE by default.
+
+**Request body:**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `provider` | string | yes | `codex` or `claude` |
+| `model` | string | yes | Provider model ID |
+| `messages` | array | yes | `{ role, content }` chat messages |
+| `systemPrompt` | string | no | System prompt |
+| `stream` | boolean | no | Defaults to `true` |
+
+**Example:**
+
+```bash
+curl -N -X POST http://localhost:4096/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "provider": "codex",
+    "model": "gpt-5.4-mini",
+    "messages": [{ "role": "user", "content": "Explain this module." }]
+  }'
+```
+
+### `POST /completions`
+
+Return a one-shot completion for an editor buffer.
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `prefix` | string | yes | Text before the cursor |
+| `suffix` | string | yes | Text after the cursor |
+| `language` | string | yes | File language |
+| `filepath` | string | yes | Current file path |
+| `maxTokens` | number | no | Completion budget |
+| `temperature` | number | no | Sampling temperature |
+| `provider` | string | no | Provider override |
+| `model` | string | no | Model override |
+
+### `POST /inline-edit`
+
+Return replacement text for a selected range.
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `file` | string | yes | File path |
+| `range` | object | yes | `startLine`, `startColumn`, `endLine`, `endColumn` |
+| `prompt` | string | yes | Edit instruction |
+| `text` | string | yes | Selected text |
+| `repoRoot` | string | no | Repository root |
+| `provider` | string | no | Provider override |
+| `model` | string | no | Model override |
+```
+
+### `GET /sessions`
+
+Lists all active sessions.
+
+```json
+[
+  {
+    "id": "abc-123",
+    "repoRoot": "/repo",
+    "provider": "claude",
+    "model": "claude-sonnet-4-6",
+    "createdAt": "2026-04-26T10:00:00.000Z"
+  }
+]
+```
+
+### `GET /sessions/:id`
+
+Get a single session by ID.
+
+### `DELETE /sessions/:id`
+
+Delete a session and free its resources.
+
+## SSE Events
+
+When streaming from `POST /chat`, the server emits `data:` lines containing one of these
+event objects:
+
+| Event | Description |
+|---|---|
+| `start` | Provider and model selected |
+| `text_delta` | Incremental text chunk from the model |
+| `done` | Final text and optional usage |
+| `error` | Error during processing |
+
+**Example stream:**
+
+```
+data: {"type":"start","provider":"codex","model":"gpt-5.4-mini"}
+data: {"type":"text_delta","text":"This module"}
+data: {"type":"done","provider":"codex","model":"gpt-5.4-mini","text":"This module..."}
+```
+
+## WebSocket
+
+Connect to:
+
+```text
+ws://localhost:4096/ws
+```
+
+The server sends a `ready` message first:
+
+```json
+{ "type": "ready", "protocolVersion": 1 }
+```
+
+### Session Messages
+
+| Client message | Purpose |
+|---|---|---|
+| `session.create` | Create a git-backed agent session |
+| `session.open` | Reopen an existing session |
+| `chat.turn` | Run an agent turn in the session worktree |
+| `run.cancel` | Cancel an active session run |
+| `changes.status` | Read changed files |
+| `changes.accept_all` | Apply all agent changes to the repo |
+| `changes.discard_all` | Drop all agent changes |
+| `changes.accept_file` | Apply one changed file |
+| `changes.discard_file` | Drop one changed file |
+
+### One-Shot Messages
+
+| Client message | Purpose |
+|---|---|
+| `chat` | Stream a stateless chat request |
+| `completion` | Stream a stateless completion request |
+| `inline.edit` | Return replacement text for an edit |
+| `cancel` | Cancel a one-shot request by ID |
+| `ping` | Health check |
+
+### Server Messages
+
+| Server message | Purpose |
+|---|---|
+| `session.created` | Session metadata |
+| `assistant.delta` | Agent text chunk |
+| `assistant.done` | Agent turn complete |
+| `inline.result` | Inline edit replacement |
+| `changes.updated` | Changed files and refs |
+| `run.status` | `syncing`, `running`, `checking`, `checkpointing`, or `done` |
+| `chat_event` | Stateless chat or completion stream event |
+| `cancelled` | Request cancelled |
+| `pong` | Ping response |
+| `error` | Error message |

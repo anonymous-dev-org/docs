@@ -1,16 +1,35 @@
 ---
-title: 'Get Started'
-description: 'Get started with our packages'
+title: '0x0'
+description: 'Modular components for building AI into developer tools.'
 ---
 
-## Our Packages
+0x0 is a small set of AI components for developer tools.
+
+Use `@anonymous-dev/0x0-server` as the local AI runtime. Use
+`@anonymous-dev/0x0-nvim-chat` for chat, inline edits, and review flows. Use
+`@anonymous-dev/0x0-nvim-completion` for ghost-text completion. Use
+`@anonymous-dev/0x0-contracts` when another client needs the same request and event shapes.
+
+## Components
 
 <Columns cols={2}>
+  <Card title="0x0 Server" href="/packages/server" style={{ textAlign: 'center' }}>
+    Local HTTP and WebSocket runtime for chat, completions, inline edits, and agent sessions.
+  </Card>
+  <Card title="0x0 Nvim Chat" href="/packages/nvim" style={{ textAlign: 'center' }}>
+    Editor chat, inline edit, and change review commands backed by the 0x0 server.
+  </Card>
+  <Card title="0x0 Nvim Completion" href="/packages/completion" style={{ textAlign: 'center' }}>
+    Inline ghost-text completion for Neovim over the same provider layer.
+  </Card>
+  <Card title="0x0 Contracts" href="/packages/contracts" style={{ textAlign: 'center' }}>
+    Shared Zod schemas for HTTP, WebSocket, provider, and editor clients.
+  </Card>
   <Card title="Rig" href="/packages/rig" style={{ textAlign: 'center' }}>
-    Opinionated macOS development environment managed with GNU Stow. Configures Neovim, Aerospace, Kitty, Zsh, and more.
+    Personal macOS development setup managed with GNU Stow.
   </Card>
   <Card title="Firetype" href="/packages/firetype" style={{ textAlign: 'center' }}>
-    Make Firestore typesafe with zero runtime overhead
+    Make Firestore typesafe with zero runtime overhead.
   </Card>
 </Columns>
 

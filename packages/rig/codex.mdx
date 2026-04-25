@@ -1,0 +1,54 @@
+---
+title: 'Codex'
+description: 'Codex CLI defaults, trusted projects, notifications, MCP servers, and memories.'
+---
+
+The `codex/` module installs `~/.codex/config.toml`.
+
+It defines the default Codex model, notification behavior, trusted local projects, MCP servers,
+and memory support for this workstation.
+
+## Defaults
+
+| Setting | Value |
+|---|---|
+| Model | `gpt-5.5` |
+| Reasoning effort | `medium` |
+| Plan mode reasoning effort | `high` |
+| Service tier | `fast` |
+| Memories | Enabled |
+
+## Notifications
+
+Codex is configured to play the macOS Blow sound for:
+
+- Agent turn completion
+- Approval requests
+
+The TUI notification list includes `agent-turn-complete` and `approval-requested`.
+
+## Trusted Projects
+
+The config marks common local workspaces as trusted so Codex can work without repeating project
+trust prompts.
+
+Examples include:
+
+```text
+/Users/p78tr4
+/Users/p78tr4/Documents/anonymous
+/Users/p78tr4/Documents/anonymous/0x0
+/Users/p78tr4/Documents/anonymous/rig
+/Users/p78tr4/Documents/lira
+```
+
+## MCP Servers
+
+Two MCP servers are configured:
+
+| Server | Use |
+|---|---|
+| `notion` | Edit and search Notion workspace content |
+| `openaiDeveloperDocs` | Search and fetch OpenAI developer documentation |
+
+Selected MCP tools are set to require approval before use.

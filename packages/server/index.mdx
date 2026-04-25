@@ -1,0 +1,55 @@
+---
+title: '0x0 Server'
+description: 'Local AI runtime for 0x0 clients.'
+---
+
+`@anonymous-dev/0x0-server` is the local runtime for AI-powered developer tools.
+
+It exposes one provider layer over OpenAI and Anthropic models. Clients can call it through
+HTTP for simple requests or WebSocket for editor sessions, agent turns, cancellation, and
+change review.
+
+## What It Provides
+
+- Provider discovery through `GET /providers`
+- Streaming chat through `POST /chat`
+- One-shot code completion through `POST /completions`
+- One-shot inline edits through `POST /inline-edit`
+- Git-backed agent sessions over `/ws`
+- Worktree-based change review with accept and discard operations
+- Shared schemas from `@anonymous-dev/0x0-contracts`
+
+## Quick Start
+
+```bash
+# from the 0x0 repo
+bun install
+
+OPENAI_API_KEY=... ANTHROPIC_API_KEY=... bun run --cwd apps/server dev
+```
+
+The server listens on `http://127.0.0.1:4096` by default. Set `PORT` to choose another
+port.
+
+## Runtime Shape
+
+| Surface | Use it for |
+|---|---|---|
+| HTTP | Stateless chat, completion, inline-edit, provider, and session endpoints |
+| SSE | Streaming output from `POST /chat` |
+| WebSocket | Editor sessions, long-running agent turns, cancellation, and review state |
+| Worktrees | Isolated agent edits before the user accepts or discards changes |
+
+## Documentation
+
+<CardGroup cols={2}>
+  <Card title="Configuration" href="/packages/server/configuration" icon="gear">
+    Environment variables, port selection, and local state
+  </Card>
+  <Card title="API Reference" href="/packages/server/api-reference" icon="book-open">
+    HTTP endpoints, WebSocket messages, and stream events
+  </Card>
+  <Card title="Providers" href="/packages/server/providers" icon="plug">
+    OpenAI and Anthropic provider configuration
+  </Card>
+</CardGroup>

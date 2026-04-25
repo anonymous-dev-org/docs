@@ -1,36 +1,40 @@
 ---
 title: 'Rig'
-description: 'Opinionated macOS development environment — managed with GNU Stow'
+description: 'Personal macOS development rig managed with GNU Stow.'
 ---
 
-**anonymous.rig** — An opinionated macOS development environment that configures your entire
-workstation from a single repository using [GNU Stow](https://www.gnu.org/software/stow/).
+Rig is a personal macOS development setup.
+
+It keeps editor, terminal, shell, window manager, Git, Codex, Homebrew, and macOS defaults in
+one repository. Each module is installed into `$HOME` with
+[GNU Stow](https://www.gnu.org/software/stow/), so the live config stays symlinked to the repo.
+
+Use it to set up a new machine, keep a workstation consistent, or inspect the exact config behind
+the anonymous.dev development environment.
 
 ## Managed Modules
 
 | Module | What it configures |
 |---|---|
-| [Aerospace](/packages/rig/aerospace) | Tiling window manager with a 9x9 workspace grid |
-| [Neovim](/packages/rig/neovim) | "MiniMax" editor config built on `mini.nvim` |
-| [Kitty](/packages/rig/kitty) | Terminal emulator with warm dark theme |
+| [AeroSpace](/packages/rig/aerospace) | Tiling window manager with a 9x9 workspace grid |
+| [Neovim](/packages/rig/neovim) | Neovim config built around `mini.nvim`, LSP, Git, DAP, requests, and AI tools |
+| [Kitty](/packages/rig/kitty) | Terminal emulator config with tab navigation, bell notifications, and a warm dark theme |
 | [Zsh](/packages/rig/zsh) | Shell with autocomplete, syntax highlighting, and lazy runtimes |
 | [Git](/packages/rig/git) | Editor and global ignores |
+| [Codex](/packages/rig/codex) | Codex CLI defaults, trusted projects, notifications, MCP servers, and memories |
 | [Brew](/packages/rig/brew) | Homebrew taps, formulas, and casks |
 | [macOS](/packages/rig/macos) | System defaults for Dock, Finder, keyboard, and appearance |
 
 ## Quick Start
 
 ```bash
-# Clone the repository
 git clone https://github.com/anonymous-dev-org/rig.git
 cd rig
 
-# Run the interactive installer
 ./init.sh
 ```
 
-The installer walks you through each module with `[y/N]` prompts. Pass `--yes` to accept
-everything non-interactively:
+The installer asks before each step. Use `--yes` to install every available module without prompts:
 
 ```bash
 ./init.sh --yes
@@ -40,23 +44,22 @@ everything non-interactively:
 
 | Requirement | Notes |
 |---|---|
-| macOS | Tested on Apple Silicon |
-| Git | Required for cloning and plugin management |
-| [Homebrew](https://brew.sh) | Installed automatically by `init.sh` if missing |
-| [GNU Stow](https://www.gnu.org/software/stow/) | Installed via Homebrew |
-| Swift compiler | Optional — only needed for Aerospace picker apps |
+| macOS | Target platform |
+| Git | Required to clone and update the repo |
+| Homebrew | Installed by `./brew/install-brew.sh` if missing |
+| GNU Stow | Installed from the Brewfile |
+| Swift compiler | Optional; used to compile AeroSpace picker apps |
 
 ## How It Works
 
-Each top-level directory (e.g. `neovim/`, `zsh/`, `kitty/`) mirrors the structure of your home
-directory. Stow creates symlinks from `~/` into the repo so your dotfiles stay version-controlled
-in one place.
+Each module mirrors paths under your home directory.
 
 ```
 rig/
   neovim/.config/nvim/init.lua   -->   ~/.config/nvim/init.lua
   zsh/.zshrc                     -->   ~/.zshrc
   kitty/.config/kitty/kitty.conf -->   ~/.config/kitty/kitty.conf
+  codex/.codex/config.toml       -->   ~/.codex/config.toml
 ```
 
-See [Installation](/packages/rig/installation) for a full walkthrough.
+Run [Installation](/packages/rig/installation) for setup and update commands.

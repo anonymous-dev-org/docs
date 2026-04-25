@@ -1,0 +1,43 @@
+---
+title: '0x0 Contracts'
+description: 'Shared schemas for 0x0 clients and the server.'
+icon: 'braces'
+---
+
+`@anonymous-dev/0x0-contracts` is the shared schema package.
+
+It defines the request, response, stream, session, and WebSocket message shapes used by the
+server and editor clients.
+
+## Core Schemas
+
+| Schema | Purpose |
+|---|---|
+| `ProviderIdSchema` | `codex` or `claude` |
+| `ChatRequestSchema` | Provider chat request |
+| `CompletionRequestSchema` | Editor completion request |
+| `InlineEditRequestSchema` | Inline edit request |
+| `ProviderInfoSchema` | Provider metadata |
+| `ChatStreamEventSchema` | Streaming chat event |
+| `WebSocketClientMessageSchema` | Client-to-server WebSocket messages |
+| `WebSocketServerMessageSchema` | Server-to-client WebSocket messages |
+
+## Why It Exists
+
+0x0 is modular by design. `@anonymous-dev/0x0-server`,
+`@anonymous-dev/0x0-nvim-chat`, `@anonymous-dev/0x0-nvim-completion`, and any future
+client should agree on one typed protocol.
+
+Use this package instead of copying payload shapes into each client.
+
+## Example
+
+```ts
+import { ChatRequestSchema } from "@anonymous-dev/0x0-contracts"
+
+const request = ChatRequestSchema.parse({
+  provider: "codex",
+  model: "gpt-5.4-mini",
+  messages: [{ role: "user", content: "Explain this file." }],
+})
+```

@@ -1,0 +1,59 @@
+---
+title: 'Multi-Agent'
+description: 'Creating and managing multiple agents'
+icon: 'users'
+---
+
+The TUI supports running multiple agents in the same conversation, each with its own
+provider, model, and system prompt.
+
+## Creating Agents
+
+Open the Agent Manager from the command palette (`Ctrl+P`) to add, remove, or configure
+agents. Each agent gets:
+
+- A unique name and color label
+- Its own provider and model
+- An independent session on the server
+
+## Mentions
+
+Use `@AgentName` in your message to direct it to a specific agent:
+
+```
+@Claude explain this function
+@Codex refactor the test file
+```
+
+## Relay Policies
+
+Control how messages are shared between agents:
+
+| Policy | Behavior |
+|---|---|
+| **MentionsOnly** | Agents only see messages addressed to them (default) |
+| **BroadcastAll** | All agents see all messages |
+
+## Threads
+
+Create coordinated multi-agent threads with:
+
+- A shared goal
+- Selected participants
+- A configurable number of iterations
+
+Agents take turns responding to achieve the goal collaboratively.
+
+## Handoff
+
+Switch a conversation to a different model mid-chat:
+
+| Mode | Description |
+|---|---|
+| **Summary** | Generates a summary of the conversation for the new model |
+| **Fresh** | Starts the new model with no prior context |
+
+## Compaction
+
+When a conversation exceeds 75% of the context window, the TUI automatically compacts it
+by summarizing earlier messages to free up space.
