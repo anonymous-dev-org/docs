@@ -1,0 +1,49 @@
+---
+title: '0x0 Server Chat'
+description: 'Streaming chat, inline edits, agent sessions, and review.'
+icon: 'message-square'
+---
+
+Server chat is the conversational app surface in `@anonymous-dev/0x0-server`.
+
+Use it for normal assistant chat, inline edit instructions, agent turns in an isolated
+worktree, cancellation, and accepting or discarding generated changes.
+
+## HTTP Chat
+
+`POST /chat` sends a stateless chat request to a configured provider. It streams SSE by
+default and can return a single JSON response when `stream` is `false`.
+
+```bash
+curl -N -X POST http://localhost:4096/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "provider": "codex",
+    "model": "gpt-5.4-mini",
+    "messages": [{ "role": "user", "content": "Explain this module." }]
+  }'
+```
+
+## Inline Edits
+
+`POST /inline-edit` converts an instruction plus a selected range into replacement text.
+Editor clients use it for focused changes where the checkout should stay under user
+control.
+
+## WebSocket Sessions
+
+`/ws` is the session surface for long-running work:
+
+| Message | Purpose |
+|---|---|
+| `session.create` | Create a git-backed agent session |
+| `session.open` | Reopen an existing session |
+| `chat.turn` | Run an agent turn in the session worktree |
+| `run.cancel` | Cancel an active run |
+| `changes.status` | Read changed files |
+| `changes.accept_all` | Apply all agent changes |
+| `changes.discard_all` | Drop all agent changes |
+| `changes.accept_file` | Apply one changed file |
+| `changes.discard_file` | Drop one changed file |
+
+The Neovim chat client and TUI both build on this surface.

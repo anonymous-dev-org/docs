@@ -40,9 +40,7 @@
           },
           {
             "group": "Reference",
-            "pages": [
-              "packages/rig/keybindings"
-            ]
+            "pages": ["packages/rig/keybindings"]
           }
         ]
       },
@@ -50,20 +48,23 @@
         "tab": "0x0",
         "groups": [
           {
-            "group": "Components",
+            "group": "Apps",
             "pages": [
               "packages/server/index",
+              "packages/server/chat",
+              "packages/server/completions",
               "packages/nvim/index",
               "packages/completion/index",
-              "packages/contracts/index"
+              "packages/tui/index"
             ]
           },
           {
+            "group": "TUI Guides",
+            "pages": ["packages/tui/keybindings", "packages/tui/agents"]
+          },
+          {
             "group": "Server Guides",
-            "pages": [
-              "packages/server/configuration",
-              "packages/server/providers"
-            ]
+            "pages": ["packages/server/configuration", "packages/server/providers"]
           },
           {
             "group": "API Reference",

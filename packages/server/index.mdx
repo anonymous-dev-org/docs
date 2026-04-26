@@ -5,9 +5,9 @@ description: 'Local AI runtime for 0x0 clients.'
 
 `@anonymous-dev/0x0-server` is the local runtime for AI-powered developer tools.
 
-It exposes one provider layer over OpenAI and Anthropic models. Clients can call it through
-HTTP for simple requests or WebSocket for editor sessions, agent turns, cancellation, and
-change review.
+It exposes one provider layer over OpenAI and Anthropic models. The primary app surfaces
+are server chat and server completions. Clients can call them through HTTP for simple
+requests or WebSocket for editor sessions, agent turns, cancellation, and change review.
 
 ## What It Provides
 
@@ -17,7 +17,6 @@ change review.
 - One-shot inline edits through `POST /inline-edit`
 - Git-backed agent sessions over `/ws`
 - Worktree-based change review with accept and discard operations
-- Shared schemas from `@anonymous-dev/0x0-contracts`
 
 ## Quick Start
 
@@ -34,7 +33,7 @@ port.
 ## Runtime Shape
 
 | Surface | Use it for |
-|---|---|---|
+|---|---|
 | HTTP | Stateless chat, completion, inline-edit, provider, and session endpoints |
 | SSE | Streaming output from `POST /chat` |
 | WebSocket | Editor sessions, long-running agent turns, cancellation, and review state |
@@ -43,6 +42,12 @@ port.
 ## Documentation
 
 <CardGroup cols={2}>
+  <Card title="Server Chat" href="/packages/server/chat" icon="message-square">
+    Chat, inline edits, agent sessions, and worktree review
+  </Card>
+  <Card title="Server Completions" href="/packages/server/completions" icon="text-cursor-input">
+    Ghost-text completion requests for editor buffers
+  </Card>
   <Card title="Configuration" href="/packages/server/configuration" icon="gear">
     Environment variables, port selection, and local state
   </Card>

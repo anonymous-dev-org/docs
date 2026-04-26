@@ -2,12 +2,14 @@
 
 Documentation for the anonymous.dev packages.
 
-The 0x0 pages describe the current modular AI components:
+The 0x0 pages describe the current app surfaces:
 
 - `@anonymous-dev/0x0-server`
-- `@anonymous-dev/0x0-nvim-chat`
-- `@anonymous-dev/0x0-nvim-completion`
-- `@anonymous-dev/0x0-contracts`
+- server chat
+- server completions
+- `@anonymous-dev/0x0-chat.nvim`
+- `@anonymous-dev/0x0-completion.nvim`
+- 0x0 TUI
 
 The Rig pages describe the macOS development setup:
 

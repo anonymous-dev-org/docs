@@ -1,0 +1,45 @@
+---
+title: '0x0 Server Completions'
+description: 'One-shot editor code completion.'
+icon: 'text-cursor-input'
+---
+
+Server completions are the narrow code-suggestion app surface in
+`@anonymous-dev/0x0-server`.
+
+Use them for ghost text in editors. A client sends the text before and after the cursor,
+the language, and the file path. The server turns that buffer context into a provider
+request and returns only the suggested completion text.
+
+## HTTP Completion
+
+`POST /completions` returns a one-shot response.
+
+| Field | Required | Description |
+|---|---|---|
+| `prefix` | yes | Text before the cursor |
+| `suffix` | yes | Text after the cursor |
+| `language` | yes | File language |
+| `filepath` | yes | Current file path |
+| `maxTokens` | no | Completion budget |
+| `temperature` | no | Sampling temperature |
+| `provider` | no | Provider override |
+| `model` | no | Model override |
+
+```bash
+curl -X POST http://localhost:4096/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prefix": "function add(a, b) {",
+    "suffix": "}",
+    "language": "javascript",
+    "filepath": "src/math.js"
+  }'
+```
+
+## WebSocket Completion
+
+Editor clients can also send a `completion` one-shot message over `/ws`. This keeps chat,
+completion, cancellation, and provider selection on the same local connection.
+
+The Neovim completion client is the first consumer of this surface.

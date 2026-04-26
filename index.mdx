@@ -1,20 +1,26 @@
 ---
-title: '0x0'
-description: 'Modular components for building AI into developer tools.'
+title: 'anonymous.dev'
+description: 'Developer tools from anonymous.dev.'
 ---
 
-0x0 is a small set of AI components for developer tools.
+anonymous.dev builds small developer tools for AI-assisted coding, editor workflows, and
+local macOS setup.
 
-Use `@anonymous-dev/0x0-server` as the local AI runtime. Use
-`@anonymous-dev/0x0-nvim-chat` for chat, inline edits, and review flows. Use
-`@anonymous-dev/0x0-nvim-completion` for ghost-text completion. Use
-`@anonymous-dev/0x0-contracts` when another client needs the same request and event shapes.
+The 0x0 apps run on a local server. Chat handles conversational coding, inline edits,
+agent sessions, and review. Completions provide narrow ghost-text suggestions for the
+current editor buffer.
 
-## Components
+## Apps
 
 <Columns cols={2}>
   <Card title="0x0 Server" href="/packages/server" style={{ textAlign: 'center' }}>
-    Local HTTP and WebSocket runtime for chat, completions, inline edits, and agent sessions.
+    Local HTTP and WebSocket runtime for the 0x0 apps.
+  </Card>
+  <Card title="0x0 Server Chat" href="/packages/server/chat" style={{ textAlign: 'center' }}>
+    Streaming chat, inline edits, agent sessions, and worktree review.
+  </Card>
+  <Card title="0x0 Server Completions" href="/packages/server/completions" style={{ textAlign: 'center' }}>
+    One-shot code completion for editor ghost text.
   </Card>
   <Card title="0x0 Nvim Chat" href="/packages/nvim" style={{ textAlign: 'center' }}>
     Editor chat, inline edit, and change review commands backed by the 0x0 server.
@@ -22,8 +28,8 @@ Use `@anonymous-dev/0x0-server` as the local AI runtime. Use
   <Card title="0x0 Nvim Completion" href="/packages/completion" style={{ textAlign: 'center' }}>
     Inline ghost-text completion for Neovim over the same provider layer.
   </Card>
-  <Card title="0x0 Contracts" href="/packages/contracts" style={{ textAlign: 'center' }}>
-    Shared Zod schemas for HTTP, WebSocket, provider, and editor clients.
+  <Card title="0x0 TUI" href="/packages/tui" style={{ textAlign: 'center' }}>
+    Terminal chat client with provider switching, conversations, and multi-agent workflows.
   </Card>
   <Card title="Rig" href="/packages/rig" style={{ textAlign: 'center' }}>
     Personal macOS development setup managed with GNU Stow.
