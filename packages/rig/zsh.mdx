@@ -67,12 +67,24 @@ If `zsh-autocomplete` is missing, the config falls back to native `compinit`.
 |---|---|
 | `b` | `bun` |
 | `bb` | `bun run` |
-| `ai` | `0x0-tui` |
+| `ai` | `0x0 nvim` |
 | `supa` | `supabase` |
 | `n` | `nvim` |
 | `nt` | `nvim +term` |
 | `claude` | `caffeinate -i claude` |
 | `codex` | `caffeinate -i codex` |
+
+## 0x0
+
+The `0x0` shell function uses the released server binary installed by Homebrew. It keeps editor
+shortcuts for the Neovim apps:
+
+| Command | Action |
+|---|---|
+| `0x0 server` | Start the released `0x0` server |
+| `0x0 health` | Query `$ZEROXZERO_SERVER_URL/health` |
+| `0x0 nvim` / `0x0 chat` | Open `:ZeroChat` |
+| `0x0 completion` | Toggle `:ZeroCompletionToggle` |
 
 ## Lazy-Loaded Runtimes
 

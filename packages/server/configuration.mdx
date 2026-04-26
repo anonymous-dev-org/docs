@@ -15,6 +15,15 @@ icon: 'gear'
 Providers can be listed even when they are not configured. A request fails if it targets a
 provider without the matching API key.
 
+When `0x0 server` starts in an interactive terminal and neither provider key is present, it asks
+for `OPENAI_API_KEY` and `ANTHROPIC_API_KEY`. Values entered at the prompt are used only for that
+server process. Add exports to your shell config for durable setup:
+
+```bash
+export OPENAI_API_KEY=...
+export ANTHROPIC_API_KEY=...
+```
+
 ## Server URL
 
 The server binds through Bun and prints its local URL on boot:
